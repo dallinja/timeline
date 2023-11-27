@@ -6,7 +6,7 @@ import { Input, inputBaseClass } from '@/components/ui/input'
 import { SelectField, SelectItem } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/cn'
-import { Entry } from '@/lib/types'
+import { Entry, EntryField, EntryFields } from '@/lib/types'
 import { useDeleteEntries, useEntries, useUpdateEntry } from '@/queries/entries'
 import { CheckedState } from '@radix-ui/react-checkbox'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -32,7 +32,7 @@ export default function DBEntriesPage() {
   const selectedEntries = entries?.filter((entry) => !!selectedRows[entry.id]) ?? []
 
   if (!entries) return null
-  const keys = Object.keys(entries[0] ?? {}) as (keyof Entry)[]
+  const fields = EntryFields
   return (
     <div className="p-4">
       <div className="mb-4 flex justify-between">
@@ -69,7 +69,7 @@ export default function DBEntriesPage() {
               <th className="border border-gray-400 px-2 py-1 text-xs">
                 <Checkbox />
               </th>
-              {keys.map((key) => (
+              {fields.map(({ key }) => (
                 <th key={key} className="border border-gray-400 px-2 py-1 text-xs">
                   {key}
                 </th>
@@ -85,8 +85,8 @@ export default function DBEntriesPage() {
                     onCheckedChange={(c) => handleSelectRow(entry.id, c)}
                   />
                 </td>
-                {keys.map((key) => (
-                  <Cell key={key} entryId={entry.id} entryKey={key} value={entry[key]} />
+                {fields.map((field) => (
+                  <Cell key={field.key} field={field} entryId={entry.id} value={entry[field.key]} />
                 ))}
               </tr>
             ))}
@@ -99,11 +99,11 @@ export default function DBEntriesPage() {
 
 type CellProps = {
   entryId: number
-  entryKey: keyof Entry
   value: any
+  field: EntryField
   startOpen?: boolean
 }
-function Cell({ entryId, entryKey, value, startOpen }: CellProps) {
+function Cell({ entryId, field, value, startOpen }: CellProps) {
   const cellRef = useRef<HTMLTableCellElement>(null)
   const [isEditing, setIsEditing] = useState(startOpen ?? false)
   const [inputValue, setInputValue] = useState(value)
@@ -111,8 +111,20 @@ function Cell({ entryId, entryKey, value, startOpen }: CellProps) {
   const { mutate: updateEntry } = useUpdateEntry()
 
   const handleSave = () => {
+    let newValue = value
+    switch (field.type) {
+      case 'number':
+        newValue = inputValue == null ? null : Number(inputValue)
+        break
+      case 'union':
+      case 'boolean':
+      case 'string':
+        newValue = inputValue == null ? null : inputValue
+        break
+      default:
+    }
     updateEntry(
-      { id: entryId, [entryKey]: inputValue },
+      { id: entryId, [field.key]: newValue },
       {
         onSuccess() {
           setIsEditing(false)
@@ -141,13 +153,32 @@ function Cell({ entryId, entryKey, value, startOpen }: CellProps) {
   return isEditing ? (
     <td ref={cellRef} className="border border-gray-300 px-2 py-1 text-xs">
       <form className="flex gap-1">
-        <input
-          autoFocus
-          className={cn(inputBaseClass, 'w-32 rounded-sm border border-gray-200 px-2 py-1')}
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
+        {field.type === 'string' || field.type === 'number' ? (
+          <input
+            autoFocus
+            className={cn(inputBaseClass, 'w-32 rounded-sm border border-gray-200 px-2 py-1')}
+            type={field.type === 'number' ? 'number' : 'text'}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+        ) : null}
+        {field.type === 'boolean' && (
+          <Checkbox checked={!!inputValue} onCheckedChange={setInputValue} />
+        )}
+        {field.type === 'union' && (
+          <SelectField
+            id={`${entryId}-${field.key}`}
+            disablePortal
+            value={inputValue}
+            onValueChange={setInputValue}
+          >
+            {field.options.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectField>
+        )}
         <button
           type="submit"
           className={cn(buttonBaseClass, 'ml-1 rounded-sm bg-black/5 px-2 py-1')}
@@ -166,7 +197,7 @@ function Cell({ entryId, entryKey, value, startOpen }: CellProps) {
     </td>
   ) : (
     <td className="border border-gray-300 px-2 py-1 text-xs" onClick={() => setIsEditing(true)}>
-      {value}
+      {field.type === 'boolean' ? <Checkbox defaultChecked={value} disabled /> : value}
     </td>
   )
 }

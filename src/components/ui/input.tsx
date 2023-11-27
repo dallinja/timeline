@@ -8,13 +8,14 @@ export const inputBaseClass =
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
+  fullWidth?: boolean
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ id, className, type, label, ...props }, ref) => {
+  ({ id, className, type, fullWidth, label, ...props }, ref) => {
     const Comp = label ? 'div' : React.Fragment
     return (
-      <Comp>
+      <Comp {...(label ? { className: fullWidth ? 'w-full' : '' } : {})}>
         {label && (
           <Text asChild className="font-semibold" fontSize="sm">
             <label htmlFor={id}>{label}</label>
@@ -25,8 +26,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           className={cn(
             inputBaseClass,
-            'h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2',
+            'h-10 rounded-md border border-input px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2',
             label && 'mt-1',
+            fullWidth && 'w-full',
             className,
           )}
           ref={ref}

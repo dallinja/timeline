@@ -70,10 +70,11 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                   General
                 </Text>
                 <div className="grid gap-4 rounded-lg border p-4">
-                  <Input name="age" label="What is your age?" />
+                  <Input name="age" label="What is your age?" fullWidth />
                   <Input
                     name="initialCash"
                     label="What is your current balance of savings and checking accounts?"
+                    fullWidth
                   />
                 </div>
               </div>
@@ -82,7 +83,11 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                   Income
                 </Text>
                 <div className="grid gap-4 rounded-lg border p-4">
-                  <Input name="income" label="What is your household annual income? (pre-tax)" />
+                  <Input
+                    name="income"
+                    label="What is your household annual income? (pre-tax)"
+                    fullWidth
+                  />
                 </div>
               </div>
               <div>
@@ -93,6 +98,7 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                   <Input
                     name="expenses"
                     label="How much are your yearly expenses minus your mortgage, income taxes, investments, and other loan payments?"
+                    fullWidth
                   />
                 </div>
               </div>
@@ -140,9 +146,9 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                       </div>
                       <Collapse open={haveMortgage === 'yes'} padding={6}>
                         <div className="mt-4 grid grid-cols-3 gap-1">
-                          <Input name="mortgageAmount" label="Rem. amount" />
-                          <Input name="mortgageYears" label="Rem. years" />
-                          <Input name="mortgageRate" label="Loan rate" />
+                          <Input name="mortgageAmount" label="Rem. amount" fullWidth />
+                          <Input name="mortgageYears" label="Rem. years" fullWidth />
+                          <Input name="mortgageRate" label="Loan rate" fullWidth />
                         </div>
                       </Collapse>
                     </div>
@@ -157,10 +163,12 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                   <Input
                     name="tradInvestments"
                     label="How much to you have in pre-tax investments? (traditional)"
+                    fullWidth
                   />
                   <Input
                     name="rothInvestments"
                     label="How much to you have in post-tax investments? (Roth)"
+                    fullWidth
                   />
                 </div>
               </div>
@@ -169,7 +177,11 @@ const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
                   Other
                 </Text>
                 <div className="grid gap-4 rounded-lg border p-4">
-                  <Input name="studentLoanAmount" label="How much Student Loan debt do you have?" />
+                  <Input
+                    name="studentLoanAmount"
+                    label="How much Student Loan debt do you have?"
+                    fullWidth
+                  />
                 </div>
               </div>
             </div>
