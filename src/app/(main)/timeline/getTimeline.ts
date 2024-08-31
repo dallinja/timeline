@@ -25,6 +25,7 @@ export function getTimeline(entries: Entry[]) {
     },
     { minYear: 9999, maxYear: 0 },
   )
+  if (!minYear || !maxYear) return []
   const years = [...Array(maxYear - minYear + 1)]
   const totals: Record<number, YearTotals[]> = {}
 

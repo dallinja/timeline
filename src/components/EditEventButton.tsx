@@ -3,6 +3,7 @@ import IncomeEvent from './IncomeEvent'
 import { Entry, EntryType } from '@/lib/types'
 import { useState } from 'react'
 import ExpenseEvent from './ExpenseEvent'
+import PropertyEvent from './PropertyEvent'
 
 export interface EditEventButtonProps {
   children: React.ReactNode
@@ -45,8 +46,8 @@ function EditEventDialogContent({
       return <IncomeEvent selectedEvent={event} onClose={onClose} />
     case 'expense':
       return <ExpenseEvent selectedEvent={event} onClose={onClose} />
-    // case 'property-house':
-    //   return <PropertyHouseEvent event={event} onClose={onClose} />
+    case 'property':
+      return <PropertyEvent selectedEvent={event} onClose={onClose} />
     default:
       return 'hey'
   }
