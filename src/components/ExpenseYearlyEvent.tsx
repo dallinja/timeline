@@ -1,4 +1,4 @@
-import { Entry } from '@/lib/types'
+import { Entry } from '@/services/entries'
 import { useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'

@@ -1,119 +1,152 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
-import { ResponsiveLine, Serie } from '@nivo/line'
-// import { line, curveCatmullRom } from 'd3-shape'
-import { useState } from 'react'
+import * as React from 'react'
+import { Bar, BarChart, CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts'
 
-export interface NetWorthChartProps {
-  data: Serie[]
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
+import { Entry } from '@/services/entries'
+import { getBalanceSheetTimeline } from '@/lib/charts/getBalanceSheetTimeline'
+import { getNetWorthTimeline } from '@/lib/charts/getNetWorthTimeline'
+
+export const description = 'An interactive bar chart'
+
+const currencyFormatter = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+})
+
+type YearTotals = {
+  year: number
+  cash: number
+  property: number
+  investments: number
+  loans: number
+  netWorth: number
 }
 
-export default function NetWorthChart({ data }: NetWorthChartProps) {
-  const [range, setRange] = useState(100)
-  return (
-    <>
-      <Input type="number" value={range} onChange={(e) => setRange(+e.target.value)} />
-      <div className="h-[400px] w-full rounded-xl border">
-        <Chart data={data} range={range} />
-      </div>
-    </>
-  )
-}
+const chartConfig = {
+  balances: {
+    label: 'Balances',
+  },
+  cash: {
+    label: 'Cash',
+    color: '#2a9d8f',
+  },
+  property: {
+    label: 'Property',
+    color: '#257697',
+  },
+  investments: {
+    label: 'Investments',
+    color: '#6a4c93',
+  },
+  loans: {
+    label: 'Loans',
+    color: '#e76f51',
+  },
+  netWorth: {
+    label: 'Net worth',
+    color: '#000000',
+  },
+} satisfies ChartConfig
 
-function Chart({ data, range }: { data: Serie[]; range: number }) {
-  const filteredData = data.map((serie) => ({
-    ...serie,
-    data: serie.data.filter((_, i) => i < range),
-  }))
+export default function NetWorthChart({ entries, maxYear }: { entries: Entry[]; maxYear: number }) {
+  // const data = getBalanceSheetTimeline(entries, maxYear)
+  const data = getNetWorthTimeline(entries, maxYear)
+  console.log('data: ', data[0])
+  // const total = React.useMemo(
+  //   () => ({
+  //     desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
+  //     mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
+  //   }),
+  //   [],
+  // )
+
   return (
-    <ResponsiveLine
-      data={filteredData}
-      margin={{ top: 50, right: 110, bottom: 50, left: 80 }}
-      xScale={{ type: 'point' }}
-      yScale={{
-        type: 'linear',
-        min: 'auto',
-        max: 'auto',
-        stacked: true,
-        reverse: false,
-        // nice: true,
-      }}
-      yFormat=" >-$,.0f"
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        // orient: 'bottom',
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        // legend: 'Year',
-        legendOffset: 36,
-        legendPosition: 'middle',
-      }}
-      axisLeft={{
-        // orient: 'left',
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        tickValues: 8,
-        // legend: 'count',
-        legendOffset: -40,
-        legendPosition: 'middle',
-        format: ' >-$,.0f',
-      }}
-      colors={{ datum: 'color' }}
-      // colors={{ scheme }}
-      enableArea
-      enablePoints={false}
-      enableGridX={false}
-      enableSlices="x"
-      lineWidth={1}
-      pointSize={10}
-      pointColor={{ theme: 'background' }}
-      pointBorderWidth={2}
-      pointBorderColor={{ from: 'serieColor' }}
-      pointLabelYOffset={-12}
-      useMesh={true}
-      layers={[
-        'grid',
-        'axes',
-        'areas',
-        'lines',
-        // Line,
-        'points',
-        'slices',
-        'markers',
-        'mesh',
-        'legends',
-        'crosshair',
-      ]}
-      legends={[
-        {
-          anchor: 'bottom-right',
-          direction: 'column',
-          justify: false,
-          translateX: 100,
-          translateY: 0,
-          itemsSpacing: 0,
-          itemDirection: 'left-to-right',
-          itemWidth: 80,
-          itemHeight: 20,
-          itemOpacity: 0.75,
-          symbolSize: 12,
-          symbolShape: 'circle',
-          symbolBorderColor: 'rgba(0, 0, 0, .5)',
-          effects: [
-            {
-              on: 'hover',
-              style: {
-                itemBackground: 'rgba(0, 0, 0, .03)',
-                itemOpacity: 1,
-              },
-            },
-          ],
-        },
-      ]}
-    />
+    <Card>
+      {/* <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+          <CardTitle>Bar Chart - Interactive</CardTitle>
+          <CardDescription>Showing total visitors for the last 3 months</CardDescription>
+        </div>
+        <div className="flex">
+          {['desktop', 'mobile'].map((key) => {
+            const chart = key as keyof typeof chartConfig
+            return (
+              <button
+                key={chart}
+                data-active={activeChart === chart}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
+                onClick={() => setActiveChart(chart)}
+              >
+                <span className="text-xs text-muted-foreground">{chartConfig[chart].label}</span>
+                <span className="text-lg font-bold leading-none sm:text-3xl">
+                  {total[key as keyof typeof total].toLocaleString()}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </CardHeader> */}
+      <CardContent className="px-2 sm:p-6">
+        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+          <ComposedChart
+            accessibilityLayer
+            data={data}
+            stackOffset="sign"
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+              // tickFormatter={(value) => {
+              //   const date = new Date(value)
+              //   return date.toLocaleDateString('en-US', {
+              //     month: 'short',
+              //     day: 'numeric',
+              //   })
+              // }}
+            />
+            <YAxis
+              tickMargin={8}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => currencyFormatter.format(value)}
+            />
+            <ChartTooltip
+              content={<ChartTooltipContent className="w-[200px]" labelKey="balances" />}
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar dataKey="cash" stackId="a" fill={`var(--color-cash)`} />
+            <Bar dataKey="property" stackId="a" fill={`var(--color-property)`} />
+            <Bar dataKey="investments" stackId="a" fill={`var(--color-investments)`} />
+            <Bar dataKey="loans" stackId="a" fill={`var(--color-loans)`} />
+            <Line
+              type="monotone"
+              dataKey="netWorth"
+              stroke="var(--color-netWorth)"
+              strokeWidth={2}
+              dot={false}
+            />
+          </ComposedChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   )
 }

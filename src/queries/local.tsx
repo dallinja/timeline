@@ -1,4 +1,4 @@
-import { CreateEntryInput, DeleteEntryInput, Entry, UpdateEntryInput } from '@/lib/types'
+import { CreateEntryInput, DeleteEntryInput, Entry, UpdateEntryInput } from '@/services/entries'
 import { getEntries, createEntries, updateEntries, deleteEntries } from '@/services/local'
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 

@@ -14,7 +14,7 @@ import {
   getHouseFromEntry,
   updateHouseEntries,
 } from '@/lib/entries/property/house'
-import { Entry } from '@/lib/types'
+import { Entry } from '@/services/entries'
 
 const DEFAULT_APPRECIATION_RATE = 0.03
 

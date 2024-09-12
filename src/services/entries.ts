@@ -1,19 +1,27 @@
-import { supabase } from '@/db/supabase'
-import { Database } from '@/db/supabaseTypes'
+import { Database } from '@/utils/supabase/database.types'
+import { createClient } from '@/utils/supabase/server'
+
+export type Entry = Database['public']['Tables']['entries']['Row']
+export type CreateEntryInput = Database['public']['Tables']['entries']['Insert']
+export type UpdateEntryInput = Database['public']['Tables']['entries']['Update']
+export type DeleteEntryInput =
+  | {
+      id: number
+    }
+  | { id: undefined; scenario: string }
+export type EntryType = 'income' | 'expense' | 'property' | 'investment' | 'loan'
 
 /**
  * READ
  */
 
-export type Entry = Database['public']['Tables']['entries']['Row']
-export type EntryCreate = Database['public']['Tables']['entries']['Insert']
-export type EntryUpdate = Database['public']['Tables']['entries']['Update']
-
-export async function getEntries() {
+export async function getEntries({ userId }: { userId: string }) {
+  const supabase = createClient()
   const { data, error } = await supabase
     .from('entries')
     .select('*, relatedEntries:entries!parent_id(*)')
-    .is('parent_id', null)
+    .match({ user_id: userId })
+  // .is('parent_id', null)
   // .returns<>()
   if (error) throw error
   return data
@@ -23,13 +31,15 @@ export async function getEntries() {
  * CREATE
  */
 
-export async function createEntries(entriesInput: EntryCreate[]) {
+export async function createEntries(entriesInput: CreateEntryInput[]) {
+  const supabase = createClient()
   const { data, error } = await supabase.from('entries').insert(entriesInput).select()
   if (error) throw error
   return data
 }
 
-export async function updateEntry(entriesInput: EntryUpdate & { id: number }) {
+export async function updateEntry(entriesInput: UpdateEntryInput & { id: number }) {
+  const supabase = createClient()
   const { data, error } = await supabase
     .from('entries')
     .update(entriesInput)

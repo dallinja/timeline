@@ -1,9 +1,9 @@
-import { Entry } from '@/lib/types'
 import { SheetHeader } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
 import IncomeJobEvent from './IncomeJobEvent'
 import IncomeOneTimeEvent from './IncomeOneTimeEvent'
+import { Entry } from '@/services/entries'
 
 export interface IncomeEventProps {
   selectedEvent?: Entry & { relatedEntries?: Entry[] | null }

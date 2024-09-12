@@ -1,4 +1,4 @@
-import { CreateEntryInput, DeleteEntryInput, UpdateEntryInput } from '@/lib/types'
+import { CreateEntryInput, DeleteEntryInput, UpdateEntryInput } from '@/services/entries'
 import {
   createEntries,
   deleteEntries,

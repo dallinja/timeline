@@ -1,9 +1,11 @@
+'use client'
+
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import IncomeEvent from './IncomeEvent'
-import { Entry, EntryType } from '@/lib/types'
 import { useState } from 'react'
 import ExpenseEvent from './ExpenseEvent'
 import PropertyEvent from './PropertyEvent'
+import { Entry, EntryType } from '@/services/entries'
 
 export interface EditEventButtonProps {
   children: React.ReactNode

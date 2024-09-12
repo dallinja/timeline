@@ -1,5 +1,5 @@
 import { FV } from '@/lib/financial'
-import { CreateEntryInput, EntryType, SubType } from '@/lib/types'
+import { CreateEntryInput, EntryType, SubType } from '@/services/entries'
 
 export function createTimeline(formData: FormData) {
   const currentYear = new Date().getFullYear()

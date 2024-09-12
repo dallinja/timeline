@@ -5,7 +5,7 @@ import {
   Entry,
   UpdateEntryInput,
   UpsertEntryInput,
-} from '@/lib/types'
+} from '@/services/entries'
 
 const ENTRIES_KEY = 'entries'
 

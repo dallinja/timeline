@@ -10,7 +10,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/cn'
 import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/entries'
 import { createJobEntries, getJobFromEntry, updateJobEntries } from '@/lib/entries/income/job'
-import { Entry } from '@/lib/types'
+import { Entry } from '@/services/entries'
 
 const DEFAULT_ANNUAL_RAISE_RATE = 0.03
 

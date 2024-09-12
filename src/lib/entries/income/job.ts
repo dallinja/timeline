@@ -4,7 +4,7 @@ import {
   EventEntries,
   UpdateEntryInput,
   UpsertEntryInput,
-} from '@/lib/types'
+} from '@/services/entries'
 
 type JobEntryInput = {
   scenario: string

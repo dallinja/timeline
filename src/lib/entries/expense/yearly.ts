@@ -1,4 +1,9 @@
-import { CreateEntryInput, EventEntries, UpdateEntryInput, UpsertEntryInput } from '@/lib/types'
+import {
+  CreateEntryInput,
+  EventEntries,
+  UpdateEntryInput,
+  UpsertEntryInput,
+} from '@/services/entries'
 
 type YearlyEntryInput = {
   scenario: string

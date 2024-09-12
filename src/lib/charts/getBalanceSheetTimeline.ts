@@ -1,5 +1,5 @@
 import { CUMPRINC, PMT } from '@/lib/financial'
-import { Entry } from '@/lib/types'
+import { Entry } from '@/services/entries'
 
 const currentYear = new Date().getFullYear()
 
@@ -10,9 +10,9 @@ type YearTotals = {
   loans: number
 }
 
-type YearData = YearTotals & { year: number }
+type YearData = YearTotals & { year: number; netWorth: number }
 
-export function getTimeline(entries: Entry[]) {
+export function getBalanceSheetTimeline(entries: Entry[], maxYearProp: number) {
   const { minYear, maxYear } = entries.reduce<{ minYear: number; maxYear: number }>(
     (acc, entry) => {
       if ((entry.start_year || currentYear) < acc.minYear) {
@@ -23,42 +23,47 @@ export function getTimeline(entries: Entry[]) {
       }
       return acc
     },
-    { minYear: 9999, maxYear: 0 },
+    { minYear: 9999, maxYear: maxYearProp },
   )
   if (!minYear || !maxYear) return []
   const years = [...Array(maxYear - minYear + 1)]
   const totals: Record<number, YearTotals[]> = {}
+  // { 2021: [ { cash: 1000, property: 0, investments: 0, loans: 0 } ] }
 
+  // For each year, calculate the totals for each asset type
   entries.forEach((entry) => {
-    const startYear = entry.start_year
-    const endYear = entry.end_year
-    if (!startYear || !endYear) return
-    const years = endYear - startYear + 1
+    const entryStartYear = entry.start_year
+    const entryEndYear = entry.end_year
+    if (!entryStartYear) return
+    const entryYears = (entryEndYear ?? maxYear) - entryStartYear + 1
 
-    ;[...Array(years)].forEach((_, ind, arr) => {
-      const year = startYear + ind
+    ;[...Array(entryYears)].forEach((_, index, arr) => {
+      const entryYear = entryStartYear + index
       const lastIndex = arr.length - 1
 
       let yearTotals = { cash: 0, property: 0, investments: 0, loans: 0 }
-      yearTotals = getCashTotals(yearTotals, entry, ind, lastIndex)
-      yearTotals = getPropertyTotals(yearTotals, entry, ind, lastIndex)
-      yearTotals = getInvestmentTotals(yearTotals, entry, ind, lastIndex)
-      yearTotals = getLoanTotals(yearTotals, entry, ind, lastIndex)
-      ;(totals[year] = totals[year] || []).push(yearTotals)
+      yearTotals = getCashTotals(yearTotals, entry, index, lastIndex)
+      yearTotals = getPropertyTotals(yearTotals, entry, index, lastIndex)
+      yearTotals = getInvestmentTotals(yearTotals, entry, index, lastIndex)
+      yearTotals = getLoanTotals(yearTotals, entry, index, lastIndex)
+      ;(totals[entryYear] = totals[entryYear] || []).push(yearTotals)
     })
   })
 
   return years.reduce<YearData[]>((acc, _, index) => {
     const year = minYear + index
-    const previous: Record<string, number> = index < 1 ? {} : acc[index - 1]
+    const previous: Record<string, number> = index < 1 ? {} : (acc[index - 1] ?? {})
     const current = {
       year,
-      cash: (previous.cash || 0) + sumBy(totals[year], 'cash'),
-      property: (previous.property || 0) + sumBy(totals[year], 'property'),
-      investments: (previous.investments || 0) + sumBy(totals[year], 'investments'),
-      loans: (previous.loans || 0) + sumBy(totals[year], 'loans'),
+      cash: Math.round((previous.cash || 0) + sumBy(totals[year], 'cash')),
+      property: Math.round((previous.property || 0) + sumBy(totals[year], 'property')),
+      investments: Math.round((previous.investments || 0) + sumBy(totals[year], 'investments')),
+      loans: Math.round((previous.loans || 0) + sumBy(totals[year], 'loans')),
     }
-    acc.push(current)
+    acc.push({
+      ...current,
+      netWorth: Math.round(current.cash + current.property + current.investments + current.loans),
+    })
     return acc
   }, [])
 }
@@ -69,7 +74,7 @@ function getCashTotals(
   index: number,
   lastIndex: number,
 ): YearTotals {
-  const { cash_start, cash_rate, cash_recurring, cash_recurring_rate } = entry
+  const { cash_start, cash_rate, cash_recurring, cash_recurring_rate, cash_end } = entry
   let totals = { ...yearTotals }
 
   // Every year
@@ -80,6 +85,11 @@ function getCashTotals(
   // First year
   if (index === 0) {
     totals.cash += cash_start || 0
+  }
+
+  // Last year
+  if (index === lastIndex) {
+    totals.cash += cash_end || 0
   }
 
   return totals
@@ -210,8 +220,8 @@ function getLoanTotals(
   return totals
 }
 
-function sumBy(arr: YearTotals[], key: keyof YearTotals) {
-  return arr?.reduce((acc, val) => ((acc += val[key] || 0), acc), 0) || 0
+function sumBy(arr: YearTotals[] | undefined, key: keyof YearTotals) {
+  return arr?.reduce((acc, val) => ((acc += val[key] || 0), acc), 0) ?? 0
 }
 
 function getFV(PV: number, rate: number, index: number) {

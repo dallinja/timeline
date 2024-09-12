@@ -1,20 +1,24 @@
-'use client'
-
 import { Text } from '@/components/ui/text'
 import { formatCurrency } from '@/lib/currency'
 import { cn } from '@/lib/cn'
 import { Button, buttonBaseClass } from './ui/button'
 import EditEventButton from './EditEventButton'
 import PlusCircleIcon from './icons/PlusCircleIcon'
-import { Entry, EntryType } from '@/lib/types'
+import { Entry, EntryType } from '@/services/entries'
 
 export interface EventTypeSummaryProps {
   eventType?: EntryType
   title?: React.ReactNode
   events?: (Entry & { relatedEntries?: Entry[] })[]
+  maxYear?: number
 }
 
-export default function EventTypeSummary({ eventType, title, events }: EventTypeSummaryProps) {
+export default function EventTypeSummary({
+  eventType,
+  title,
+  events,
+  maxYear,
+}: EventTypeSummaryProps) {
   // DOM
 
   return (
@@ -37,7 +41,8 @@ export default function EventTypeSummary({ eventType, title, events }: EventType
           >
             <Text className="text-left">
               {event.start_year}
-              {event.end_year !== event.start_year && `-'${String(event.end_year).substring(2)}`}
+              {event.end_year !== event.start_year &&
+                `-'${String(event.end_year ?? maxYear).substring(2)}`}
             </Text>
             <Text className="text-left">{event.name}</Text>
             <Text className="text-right">{getAmount(event)}</Text>
