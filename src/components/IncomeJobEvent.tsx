@@ -147,7 +147,7 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
       {/* {promotions.map((event) => (
             <div key={event.year} className="mb-2 grid grid-cols-[60px,1fr] gap-2">
               <Text>{event.year}</Text>
-              <Text className="text-right">{formatCurrency(event.amount)}</Text>
+              <Text className="text-right">{formatCurrency(event.amount, true)}</Text>
             </div>
           ))} */}
       <Text className="mt-6" bold>

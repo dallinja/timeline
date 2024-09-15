@@ -1,19 +1,12 @@
 import { cn } from '@/lib/cn'
 import { TableCell, TableHead, TableRow } from '../ui/table'
-
-type Data = {
-  year: number
-  income: number
-  expenses: number
-  cash: number
-  property: number
-  investments: number
-}
+import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { formatCurrency } from '@/lib/currency'
 
 type FooterRowProps = {
   title: string
-  data: Data[]
-  calcData: (yearData: Data) => number
+  data: YearData[]
+  calcData: (yearData: YearData) => number
 }
 
 export default function FooterRow({ title, data, calcData }: FooterRowProps) {
@@ -24,7 +17,7 @@ export default function FooterRow({ title, data, calcData }: FooterRowProps) {
       </TableHead>
       {data.map((yearData) => (
         <TableCell key={yearData.year} className="h-8 bg-gray-100 text-right font-semibold">
-          ${calcData(yearData)}
+          {formatCurrency(calcData(yearData))}
         </TableCell>
       ))}
     </TableRow>

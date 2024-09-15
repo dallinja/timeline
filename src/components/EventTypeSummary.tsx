@@ -56,21 +56,21 @@ export default function EventTypeSummary({
 function getAmount(event: Entry) {
   if (event.type === 'income' || event.type === 'expense') {
     if (event.cash_recurring) {
-      return formatCurrency(event.cash_recurring, 0)
+      return formatCurrency(event.cash_recurring)
     } else if (event.cash_start) {
-      return formatCurrency(event.cash_start, 0)
+      return formatCurrency(event.cash_start)
     }
   }
   if (event.type === 'property') {
     if (event.property_start) {
-      return formatCurrency(event.property_start, 0)
+      return formatCurrency(event.property_start)
     }
   }
   if (event.type === 'investment') {
     if (event.investments_recurring) {
-      return formatCurrency(event.investments_recurring, 0)
+      return formatCurrency(event.investments_recurring)
     } else if (event.investments_start) {
-      return formatCurrency(event.investments_start, 0)
+      return formatCurrency(event.investments_start)
     }
   }
   return ''

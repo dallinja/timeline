@@ -1,6 +1,8 @@
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import CashFlows from './CashFlows'
 import BalanceSheet from './balanceSheet'
+import { Entry } from '@/services/entries'
+import { getNetWorthTimeline } from '@/lib/charts/getNetWorthTimeline'
 // 40 years of data
 type Data = {
   year: number
@@ -10,6 +12,7 @@ type Data = {
   property: number
   investments: number
 }[]
+
 // prettier-ignore
 const data = [
   { year: 2020, income: 100000, expenses: 50000, cash: 100, property: 100, investments: 100 },
@@ -54,7 +57,8 @@ const data = [
   { year: 2059, income: 100000, expenses: 50000, cash: 2100, property: 2050, investments: 2050 },
 ]
 
-export default function Breakdown() {
+export default function Breakdown({ entries }: { entries: Entry[] }) {
+  const data = getNetWorthTimeline(entries, 2086)
   return (
     <div>
       <Table>

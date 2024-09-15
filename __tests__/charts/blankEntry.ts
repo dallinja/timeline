@@ -1,0 +1,32 @@
+import { Entry } from '@/services/entries'
+
+export const blankEntry: Entry = {
+  id: 0,
+  name: 'Test',
+  type: 'income',
+  sub_type: 'job',
+  parent_id: null,
+  start_year: 2000,
+  end_year: 2020,
+  user_id: 'user_1234',
+  created_at: '2021-01-01',
+
+  cash_end: 0,
+  cash_rate: 0,
+  cash_recurring: 0,
+  cash_recurring_rate: 0,
+  cash_start: 0,
+  cash_taxable: false,
+  investments_end: 0,
+  investments_rate: 0,
+  investments_recurring: 0,
+  investments_recurring_rate: 0,
+  investments_start: 0,
+  loans_end: 0,
+  loans_periods: 0,
+  loans_rate: 0,
+  loans_start: 0,
+  property_end: 0,
+  property_rate: 0,
+  property_start: 0,
+}

@@ -37,7 +37,10 @@ export default async function Timeline({
     <>
       <div className="w-full p-8">
         <NetWorthChart entries={entries} maxYear={2086} />
-        <TabGroup Events={<Events entries={entries} />} Breakdown={<Breakdown />} />
+        <TabGroup
+          Events={<Events entries={entries} />}
+          Breakdown={<Breakdown entries={entries} />}
+        />
       </div>
     </>
   )

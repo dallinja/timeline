@@ -2,15 +2,119 @@ export function pmt(presentValue: number, rate: number, periods: number) {
   return (presentValue * rate * Math.pow(1 + rate, periods)) / (Math.pow(1 + rate, periods) - 1)
 }
 
-export function fv(presentValue: number, rate: number, periods: number, period: number) {
-  return (
-    (presentValue * (Math.pow(1 + rate, periods) - Math.pow(1 + rate, period))) /
-    (Math.pow(1 + rate, periods) - 1)
-  )
+export function fv(
+  presentValue: number,
+  rate: number,
+  periods: number,
+  payment: number = 0,
+  paymentAtBeginning: boolean = false,
+) {
+  // interestRate should be a decimal, e.g., 5% should be passed as 0.05
+  const futureValueLumpSum = presentValue * Math.pow(1 + rate, periods)
+
+  let futureValuePayments
+  if (paymentAtBeginning) {
+    // Payments at the beginning of each period
+    futureValuePayments = payment * ((Math.pow(1 + rate, periods) - 1) / rate) * (1 + rate)
+  } else {
+    // Payments at the end of each period
+    futureValuePayments = payment * ((Math.pow(1 + rate, periods) - 1) / rate)
+  }
+
+  return futureValueLumpSum + futureValuePayments
+}
+
+export function fvGrowingAnnuity(
+  firstPayment: number,
+  rate: number,
+  growthRate: number,
+  periods: number,
+) {
+  const firstYear = firstPayment
+  const growingAnnuity =
+    (Math.pow(1 + rate, periods) - Math.pow(1 + growthRate, periods)) / (rate - growthRate)
+  return firstYear * growingAnnuity
+}
+
+// appreciateing value
+export function av(presentValue: number, rate: number, periods: number) {
+  return presentValue * Math.pow(1 + rate, periods)
 }
 
 export function rate(presentValue: number, finalValue: number, periods: number) {
   return Math.pow(finalValue / presentValue, 1 / periods) - 1
+}
+
+/**
+ * Calculates the cumulative principal paid on a loan between two periods.
+ *
+ * @param principal - The initial loan amount.
+ * @param interestRate - The periodic interest rate (as a decimal, e.g., 0.05 for 5%).
+ * @param totalPeriods - The total number of payment periods (e.g., months).
+ * @param startPeriod - The starting payment period (1-based index).
+ * @param endPeriod - The ending payment period (1-based index).
+ * @returns The cumulative principal paid between the start and end periods.
+ */
+export function cumprinc(
+  principal: number,
+  interestRate: number,
+  totalPeriods: number,
+  startPeriod: number,
+  endPeriod: number,
+): number {
+  // Input Validation
+  if (principal <= 0) {
+    throw new Error('Principal must be greater than 0.')
+  }
+  if (interestRate < 0) {
+    throw new Error('Interest rate cannot be negative.')
+  }
+  if (totalPeriods <= 0 || !Number.isInteger(totalPeriods)) {
+    throw new Error('Total periods must be a positive integer.')
+  }
+  if (
+    startPeriod < 1 ||
+    endPeriod > totalPeriods ||
+    startPeriod > endPeriod ||
+    !Number.isInteger(startPeriod) ||
+    !Number.isInteger(endPeriod)
+  ) {
+    throw new Error('Invalid start or end period.')
+  }
+
+  // Convert annual interest rate to a periodic rate
+  const periodicInterestRate = interestRate
+
+  // Calculate the fixed monthly payment using the amortization formula
+  const monthlyPayment =
+    (principal * periodicInterestRate * Math.pow(1 + periodicInterestRate, totalPeriods)) /
+    (Math.pow(1 + periodicInterestRate, totalPeriods) - 1)
+
+  let cumulativePrincipal = 0
+  let remainingBalance = principal
+
+  for (let period = 1; period <= endPeriod; period++) {
+    // Calculate interest for the current period
+    const interestPayment = remainingBalance * periodicInterestRate
+
+    // Calculate principal for the current period
+    const principalPayment = monthlyPayment - interestPayment
+
+    // If within the desired range, add to cumulative principal
+    if (period >= startPeriod) {
+      cumulativePrincipal += principalPayment
+    }
+
+    // Update remaining balance
+    remainingBalance -= principalPayment
+
+    // Early exit if loan is paid off
+    if (remainingBalance <= 0) {
+      break
+    }
+  }
+
+  return cumulativePrincipal
 }
 
 export function appreciationValue(presentValue: number, rate: number, periods: number) {
@@ -203,8 +307,8 @@ export function IPMT(
         ? 0
         : -pv
       : type === 1
-      ? FV(rate, per - 2, payment, pv, 1) - payment
-      : FV(rate, per - 1, payment, pv, 0)
+        ? FV(rate, per - 2, payment, pv, 1) - payment
+        : FV(rate, per - 1, payment, pv, 0)
 
   // Return interest
   return interest * rate

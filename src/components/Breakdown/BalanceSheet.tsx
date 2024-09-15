@@ -5,18 +5,10 @@ import HeaderRow, { CollapseButton } from './HeaderRow'
 import { useState } from 'react'
 import FooterRow from './FooterRow'
 import DataRow from './DataRow'
-
-type Data = {
-  year: number
-  income: number
-  expenses: number
-  cash: number
-  property: number
-  investments: number
-}
+import { YearData } from '@/lib/charts/getNetWorthTimeline'
 
 type BalanceSheetProps = {
-  data: Data[]
+  data: YearData[]
 }
 export default function BalanceSheet({ data }: BalanceSheetProps) {
   const [expandAll, setExpandAll] = useState({
@@ -72,20 +64,14 @@ export default function BalanceSheet({ data }: BalanceSheetProps) {
         />
 
         {/* TOTAL */}
-        <FooterRow
-          title="Net worth"
-          data={data}
-          calcData={(yearData) =>
-            yearData.income + yearData.property + yearData.investments - yearData.expenses
-          }
-        />
+        <FooterRow title="Net worth" data={data} calcData={(yearData) => yearData.netWorth} />
       </TableBody>
     </>
   )
 }
 
 type AssetsProps = {
-  data: Data[]
+  data: YearData[]
   expanded: boolean
   onToggleOpen: () => void
 }
@@ -124,7 +110,7 @@ function Assets({ data, expanded, onToggleOpen }: AssetsProps) {
 }
 
 type LiabilitiesProps = {
-  data: Data[]
+  data: YearData[]
   expanded: boolean
   onToggleOpen: () => void
 }
@@ -136,18 +122,18 @@ function Liabilities({ data, expanded, onToggleOpen }: LiabilitiesProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.property}
+        calcData={(yearData) => yearData.loans}
       />
       <DataRow
         title="Loans"
         data={data}
-        calcData={(yearData) => yearData.property}
+        calcData={(yearData) => yearData.loans}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.property}
+        calcData={(yearData) => yearData.loans}
         hidden={!expanded}
         bold
       />

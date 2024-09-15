@@ -1,14 +1,7 @@
 import { cn } from '@/lib/cn'
 import { TableRow, TableHead, TableCell } from '../ui/table'
-
-type Data = {
-  year: number
-  income: number
-  expenses: number
-  cash: number
-  property: number
-  investments: number
-}
+import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { formatCurrency } from '@/lib/currency'
 
 export default function DataRow({
   title,
@@ -18,8 +11,8 @@ export default function DataRow({
   bold,
 }: {
   title: string
-  data: Data[]
-  calcData: (yearData: Data) => number
+  data: YearData[]
+  calcData: (yearData: YearData) => number
   hidden: boolean
   bold?: boolean
 }) {
@@ -35,7 +28,7 @@ export default function DataRow({
       </TableHead>
       {data.map((yearData) => (
         <TableCell key={yearData.year} className={cn('text-right', bold && 'font-semibold')}>
-          ${calcData(yearData)}
+          {formatCurrency(calcData(yearData))}
         </TableCell>
       ))}
     </TableRow>

@@ -11,7 +11,7 @@ type YearTotals = {
   netWorth?: number
 }
 
-type YearData = YearTotals & { year: number; netWorth: number }
+export type YearData = YearTotals & { year: number; netWorth: number }
 
 export function getNetWorthTimeline(entries: Entry[], maxYearProp: number) {
   const { minYear, maxYear } = entries.reduce<{ minYear: number; maxYear: number }>(

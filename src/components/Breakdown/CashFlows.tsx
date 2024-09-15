@@ -5,18 +5,10 @@ import HeaderRow, { CollapseButton } from './HeaderRow'
 import { useState } from 'react'
 import FooterRow from './FooterRow'
 import DataRow from './DataRow'
-
-type Data = {
-  year: number
-  income: number
-  expenses: number
-  cash: number
-  property: number
-  investments: number
-}
+import { YearData } from '@/lib/charts/getNetWorthTimeline'
 
 type CashFlowsProps = {
-  data: Data[]
+  data: YearData[]
 }
 export default function CashFlows({ data }: CashFlowsProps) {
   const [expandAll, setExpandAll] = useState({
@@ -83,7 +75,7 @@ export default function CashFlows({ data }: CashFlowsProps) {
           title="Total Cash"
           data={data}
           calcData={(yearData) =>
-            yearData.income + yearData.property + yearData.investments - yearData.expenses
+            yearData.cash * 2 + yearData.property + yearData.investments - yearData.cash
           }
         />
       </TableBody>
@@ -92,7 +84,7 @@ export default function CashFlows({ data }: CashFlowsProps) {
 }
 
 type OperatingProps = {
-  data: Data[]
+  data: YearData[]
   expanded: boolean
   onToggleOpen: () => void
 }
@@ -104,24 +96,24 @@ function Operating({ data, expanded, onToggleOpen }: OperatingProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.income - yearData.expenses}
+        calcData={(yearData) => yearData.cash * 2 - yearData.cash}
       />
       <DataRow
         title="Income"
         data={data}
-        calcData={(yearData) => yearData.income}
+        calcData={(yearData) => yearData.cash * 2}
         hidden={!expanded}
       />
       <DataRow
         title="Expenses"
         data={data}
-        calcData={(yearData) => yearData.expenses}
+        calcData={(yearData) => yearData.cash}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.income - yearData.expenses}
+        calcData={(yearData) => yearData.cash * 2 - yearData.cash}
         hidden={!expanded}
         bold
       />
@@ -130,7 +122,7 @@ function Operating({ data, expanded, onToggleOpen }: OperatingProps) {
 }
 
 type InvestingProps = {
-  data: Data[]
+  data: YearData[]
   expanded: boolean
   onToggleOpen: () => void
 }
@@ -168,7 +160,7 @@ function Investing({ data, expanded, onToggleOpen }: InvestingProps) {
 }
 
 type FinancingProps = {
-  data: Data[]
+  data: YearData[]
   expanded: boolean
   onToggleOpen: () => void
 }
@@ -180,18 +172,18 @@ function Financing({ data, expanded, onToggleOpen }: FinancingProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.cash}
+        calcData={(yearData) => yearData.loans}
       />
       <DataRow
         title="Mortgage"
         data={data}
-        calcData={(yearData) => yearData.cash}
+        calcData={(yearData) => yearData.loans}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.cash}
+        calcData={(yearData) => yearData.loans}
         hidden={!expanded}
         bold
       />

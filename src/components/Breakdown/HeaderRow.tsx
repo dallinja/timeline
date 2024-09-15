@@ -2,22 +2,15 @@ import { cn } from '@/lib/cn'
 import { TableCell, TableHead, TableRow } from '../ui/table'
 import { buttonBaseClass } from '../ui/button'
 import { ChevronDown } from 'lucide-react'
-
-type Data = {
-  year: number
-  income: number
-  expenses: number
-  cash: number
-  property: number
-  investments: number
-}
+import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { formatCurrency } from '@/lib/currency'
 
 type HeaderRowProps = {
   title: string
   showDetails: boolean
   setShowDetails: (value: boolean) => void
-  data: Data[]
-  calcData: (yearData: Data) => number
+  data: YearData[]
+  calcData: (yearData: YearData) => number
 }
 
 export default function HeaderRow({
@@ -42,8 +35,8 @@ export default function HeaderRow({
       ) : (
         <>
           {data.map((yearData) => (
-            <TableCell key={yearData.year} className="h-8 text-right font-semibold">
-              ${calcData(yearData)}
+            <TableCell key={yearData.year} className="h-8 text-right font-medium">
+              {formatCurrency(calcData(yearData))}
             </TableCell>
           ))}
         </>
