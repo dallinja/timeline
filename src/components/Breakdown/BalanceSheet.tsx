@@ -5,7 +5,7 @@ import HeaderRow, { CollapseButton } from './HeaderRow'
 import { useState } from 'react'
 import FooterRow from './FooterRow'
 import DataRow from './DataRow'
-import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { YearData } from '@/lib/charts/types'
 
 type BalanceSheetProps = {
   data: YearData[]
@@ -83,25 +83,30 @@ function Assets({ data, expanded, onToggleOpen }: AssetsProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.cash + yearData.property + yearData.investments}
+        calcData={(yearData) => yearData.assets.total}
       />
-      <DataRow title="Cash" data={data} calcData={(yearData) => yearData.cash} hidden={!expanded} />
+      <DataRow
+        title="Cash"
+        data={data}
+        calcData={(yearData) => yearData.assets.cash}
+        hidden={!expanded}
+      />
       <DataRow
         title="Property"
         data={data}
-        calcData={(yearData) => yearData.property}
+        calcData={(yearData) => yearData.assets.property}
         hidden={!expanded}
       />
       <DataRow
         title="Investments"
         data={data}
-        calcData={(yearData) => yearData.investments}
+        calcData={(yearData) => yearData.assets.investments}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.cash + yearData.property + yearData.investments}
+        calcData={(yearData) => yearData.assets.total}
         hidden={!expanded}
         bold
       />
@@ -122,18 +127,18 @@ function Liabilities({ data, expanded, onToggleOpen }: LiabilitiesProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.liabilities.total}
       />
       <DataRow
         title="Loans"
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.liabilities.loans}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.liabilities.total}
         hidden={!expanded}
         bold
       />

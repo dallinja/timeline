@@ -9,6 +9,7 @@ import { Entry, EntryType, getEntries } from '@/services/entries'
 import Events from './Events'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Breakdown from '@/components/Breakdown/Breakdown'
+import getYearsData from '@/lib/charts/getYearsData'
 
 type AssetType = 'cash' | 'property' | 'loans' | 'investments' | '_'
 

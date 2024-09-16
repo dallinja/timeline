@@ -9,11 +9,16 @@ export default function getYearDataInvestments(
   index: number,
   lastIndex: number,
 ): YearData {
-  const { investments_start, investments_rate, investments_recurring, investments_recurring_rate } =
-    entry
+  const {
+    existing,
+    investments_start,
+    investments_rate,
+    investments_recurring,
+    investments_recurring_rate,
+  } = entry
   const yearData = emptyYearData()
 
-  // Every year
+  // Every year - initial value (investments_start)
   const endOfYearValue = investments_start
     ? fv(investments_start, investments_rate ?? 0, index + 1)
     : 0
@@ -24,45 +29,50 @@ export default function getYearDataInvestments(
   yearData.assets.investments += change
   yearData.netWorth += change
 
-  // Growing annuity
-  let yearGrowingAnnuity = 0
+  // Every year - Growing annuity (investments_recurring)
+  let endOfYearGrowingAnnuity = 0
+  let startOfYearGrowingAnnuity = 0
   if (investments_rate && investments_recurring) {
-    yearGrowingAnnuity =
-      fvGrowingAnnuity(
-        investments_recurring,
-        investments_rate,
-        investments_recurring_rate ?? 0,
-        index + 1,
-      ) -
-      fvGrowingAnnuity(
-        investments_recurring,
-        investments_rate,
-        investments_recurring_rate ?? 0,
-        index,
-      )
+    endOfYearGrowingAnnuity = fvGrowingAnnuity(
+      investments_recurring,
+      investments_rate,
+      investments_recurring_rate ?? 0,
+      index + 1,
+    )
+    startOfYearGrowingAnnuity = fvGrowingAnnuity(
+      investments_recurring,
+      investments_rate,
+      investments_recurring_rate ?? 0,
+      index,
+    )
+    const growingAnnuityChange = endOfYearGrowingAnnuity - startOfYearGrowingAnnuity
     const payment = fv(investments_recurring, investments_recurring_rate ?? 0, index)
     yearData.investing.investments -= payment
 
     yearData.assets.cash -= payment
-    yearData.assets.investments += yearGrowingAnnuity
-    yearData.netWorth += yearGrowingAnnuity - payment
+    yearData.assets.investments += growingAnnuityChange
+    yearData.netWorth += growingAnnuityChange - payment
   }
 
-  // First year
+  // First year - initial value (investments_start)
   if (index === 0) {
-    yearData.investing.investments -= investments_start ?? 0
-
-    yearData.assets.cash -= investments_start ?? 0
+    if (existing) {
+      yearData.netWorth += investments_start ?? 0
+    } else {
+      yearData.investing.investments -= investments_start ?? 0
+      yearData.assets.cash -= investments_start ?? 0
+    }
     yearData.assets.investments += investments_start ?? 0
   }
 
   // Last year
   if (index === lastIndex) {
-    const change = endOfYearValue + yearGrowingAnnuity
-    yearData.investing.investments += change
+    // convert all investments to cash (start + recurring)
+    const endAmount = endOfYearValue + endOfYearGrowingAnnuity
+    yearData.investing.investments += endAmount
 
-    yearData.assets.cash += change
-    yearData.assets.investments -= change
+    yearData.assets.cash += endAmount
+    yearData.assets.investments -= endAmount
   }
 
   const roundedYearData = roundDataToDecimals(yearData, 4)

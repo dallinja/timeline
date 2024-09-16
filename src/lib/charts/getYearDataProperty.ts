@@ -9,7 +9,7 @@ export default function getYearDataProperty(
   index: number,
   lastIndex: number,
 ): YearData {
-  const { property_start, property_rate } = entry
+  const { existing, property_start, property_rate } = entry
   const yearData = emptyYearData()
 
   // Every year
@@ -21,9 +21,12 @@ export default function getYearDataProperty(
 
   // First year
   if (index === 0) {
-    yearData.investing.property -= property_start ?? 0
-
-    yearData.assets.cash -= property_start ?? 0
+    if (existing) {
+      yearData.netWorth += property_start ?? 0
+    } else {
+      yearData.investing.property -= property_start ?? 0
+      yearData.assets.cash -= property_start ?? 0
+    }
     yearData.assets.property += property_start ?? 0
   }
 

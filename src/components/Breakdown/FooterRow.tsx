@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn'
 import { TableCell, TableHead, TableRow } from '../ui/table'
-import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { YearData } from '@/lib/charts/types'
 import { formatCurrency } from '@/lib/currency'
 
 type FooterRowProps = {

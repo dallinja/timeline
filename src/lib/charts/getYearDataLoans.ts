@@ -5,7 +5,7 @@ import checkYearData from './checkYearData'
 import { roundDataToDecimals } from '../number'
 
 export default function getYearDataLoans(entry: Entry, index: number, lastIndex: number): YearData {
-  const { loans_start, loans_rate, loans_periods } = entry
+  const { existing, loans_start, loans_rate, loans_periods } = entry
   const yearData = emptyYearData()
 
   if (!loans_start || !loans_rate || !loans_periods) return yearData
@@ -33,9 +33,12 @@ export default function getYearDataLoans(entry: Entry, index: number, lastIndex:
 
   // First year
   if (index === 0) {
-    yearData.financing.loans += loans_start
-
-    yearData.assets.cash += loans_start
+    if (existing) {
+      yearData.netWorth -= loans_start
+    } else {
+      yearData.financing.loans += loans_start
+      yearData.assets.cash += loans_start
+    }
     yearData.liabilities.loans += loans_start
   }
 

@@ -5,7 +5,7 @@ import HeaderRow, { CollapseButton } from './HeaderRow'
 import { useState } from 'react'
 import FooterRow from './FooterRow'
 import DataRow from './DataRow'
-import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { YearData } from '@/lib/charts/types'
 
 type CashFlowsProps = {
   data: YearData[]
@@ -75,7 +75,7 @@ export default function CashFlows({ data }: CashFlowsProps) {
           title="Total Cash"
           data={data}
           calcData={(yearData) =>
-            yearData.cash * 2 + yearData.property + yearData.investments - yearData.cash
+            yearData.operating.total + yearData.investing.total + yearData.financing.total
           }
         />
       </TableBody>
@@ -96,24 +96,24 @@ function Operating({ data, expanded, onToggleOpen }: OperatingProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.cash * 2 - yearData.cash}
+        calcData={(yearData) => yearData.operating.total}
       />
       <DataRow
         title="Income"
         data={data}
-        calcData={(yearData) => yearData.cash * 2}
+        calcData={(yearData) => yearData.operating.income}
         hidden={!expanded}
       />
       <DataRow
         title="Expenses"
         data={data}
-        calcData={(yearData) => yearData.cash}
+        calcData={(yearData) => yearData.operating.expenses}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.cash * 2 - yearData.cash}
+        calcData={(yearData) => yearData.operating.total}
         hidden={!expanded}
         bold
       />
@@ -134,24 +134,24 @@ function Investing({ data, expanded, onToggleOpen }: InvestingProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.property + yearData.investments}
+        calcData={(yearData) => yearData.investing.total}
       />
       <DataRow
         title="Property"
         data={data}
-        calcData={(yearData) => yearData.property}
+        calcData={(yearData) => yearData.investing.property}
         hidden={!expanded}
       />
       <DataRow
         title="Investments"
         data={data}
-        calcData={(yearData) => yearData.investments}
+        calcData={(yearData) => yearData.investing.investments}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.property + yearData.investments}
+        calcData={(yearData) => yearData.investing.total}
         hidden={!expanded}
         bold
       />
@@ -172,18 +172,18 @@ function Financing({ data, expanded, onToggleOpen }: FinancingProps) {
         showDetails={expanded}
         setShowDetails={onToggleOpen}
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.financing.total}
       />
       <DataRow
         title="Mortgage"
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.financing.loans}
         hidden={!expanded}
       />
       <DataRow
         title="Total"
         data={data}
-        calcData={(yearData) => yearData.loans}
+        calcData={(yearData) => yearData.financing.total}
         hidden={!expanded}
         bold
       />

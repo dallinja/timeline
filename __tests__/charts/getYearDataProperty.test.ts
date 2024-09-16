@@ -17,6 +17,18 @@ describe('property', () => {
     expect(yearData.netWorth).toBe(3000)
   })
 
+  test('Property first year of existing', () => {
+    const entry: Entry = {
+      ...blankEntry,
+      existing: true,
+      property_start: 100000,
+      property_rate: 0.03,
+    }
+    const yearData = getYearDataProperty(entry, 0, 4)
+    expect(yearData.assets.property).toBe(103000)
+    expect(yearData.netWorth).toBe(103000)
+  })
+
   test('Property first year of 5', () => {
     const entry: Entry = {
       ...blankEntry,

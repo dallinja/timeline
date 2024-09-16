@@ -15,6 +15,7 @@ import {
 import { Entry } from '@/services/entries'
 import { getBalanceSheetTimeline } from '@/lib/charts/getBalanceSheetTimeline'
 import { getNetWorthTimeline } from '@/lib/charts/getNetWorthTimeline'
+import getYearsData from '@/lib/charts/getYearsData'
 
 export const description = 'An interactive bar chart'
 
@@ -23,15 +24,6 @@ const currencyFormatter = Intl.NumberFormat('en-US', {
   currency: 'USD',
   maximumFractionDigits: 0,
 })
-
-type YearTotals = {
-  year: number
-  cash: number
-  property: number
-  investments: number
-  loans: number
-  netWorth: number
-}
 
 const chartConfig = {
   balances: {
@@ -49,6 +41,10 @@ const chartConfig = {
     label: 'Investments',
     color: '#6a4c93',
   },
+  negativeCash: {
+    label: 'Cash',
+    color: '#e63946',
+  },
   loans: {
     label: 'Loans',
     color: '#e76f51',
@@ -60,16 +56,16 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function NetWorthChart({ entries, maxYear }: { entries: Entry[]; maxYear: number }) {
-  // const data = getBalanceSheetTimeline(entries, maxYear)
-  const data = getNetWorthTimeline(entries, maxYear)
-  console.log('data: ', data[0])
-  // const total = React.useMemo(
-  //   () => ({
-  //     desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-  //     mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
-  //   }),
-  //   [],
-  // )
+  const yearsData = getYearsData(entries, maxYear)
+  const data = yearsData.map((yearData) => ({
+    year: yearData.year,
+    cash: yearData.assets.cash > 0 ? yearData.assets.cash : 0,
+    property: yearData.assets.property,
+    investments: yearData.assets.investments,
+    negativeCash: yearData.assets.cash < 0 ? yearData.assets.cash : 0,
+    loans: -yearData.liabilities.loans,
+    netWorth: yearData.netWorth,
+  }))
 
   return (
     <Card>
@@ -136,6 +132,7 @@ export default function NetWorthChart({ entries, maxYear }: { entries: Entry[]; 
             <Bar dataKey="cash" stackId="a" fill={`var(--color-cash)`} />
             <Bar dataKey="property" stackId="a" fill={`var(--color-property)`} />
             <Bar dataKey="investments" stackId="a" fill={`var(--color-investments)`} />
+            <Bar dataKey="negativeCash" stackId="a" fill={`var(--color-negativeCash)`} />
             <Bar dataKey="loans" stackId="a" fill={`var(--color-loans)`} />
             <Line
               type="monotone"

@@ -20,6 +20,21 @@ describe('investments', () => {
     expect(yearData.netWorth).toBe(10000)
   })
 
+  test('Investments first year of existing', () => {
+    const entry: Entry = {
+      ...blankEntry,
+      existing: true,
+      investments_start: 100000,
+      investments_rate: 0.1,
+      investments_recurring: 3000,
+      investments_recurring_rate: 0.03,
+    }
+    const yearData = getYearDataInvestments(entry, 0, 4)
+    expect(yearData.investing.investments).toBe(-3000)
+    expect(yearData.assets.cash).toBe(-3000)
+    expect(yearData.assets.investments).toBe(110000 + 3000)
+    expect(yearData.netWorth).toBe(100000 + 10000)
+  })
   test('Investments first year of 5', () => {
     const entry: Entry = {
       ...blankEntry,
@@ -58,15 +73,20 @@ describe('investments', () => {
       investments_recurring: 3000,
       investments_recurring_rate: 0.03,
     }
-    const yearData = getYearDataInvestments(entry, 4, 5)
-    expect(yearData.investing.investments).toBeCloseTo(-3376.53, 2)
-    expect(yearData.assets.cash).toBeCloseTo(-3376.53, 2)
+    const yearData = getYearDataInvestments(entry, 4, 4)
 
+    const finalPayment = fv(3000, 0.03, 5 - 1)
     const finalValueOfStart = fv(100000, 0.1, 5)
     const changeOfStart = finalValueOfStart - fv(100000, 0.1, 4)
     const finalValueOfPayments = fvGrowingAnnuity(3000, 0.1, 0.03, 5)
     const changeOfPayments = finalValueOfPayments - fvGrowingAnnuity(3000, 0.1, 0.03, 4)
-    expect(yearData.assets.investments).toBeCloseTo(changeOfStart + changeOfPayments, 2)
-    expect(yearData.netWorth).toBeCloseTo(changeOfStart + changeOfPayments - 3376.53, 2)
+    const finalValueAll = finalValueOfStart + finalValueOfPayments
+    expect(yearData.investing.investments).toBeCloseTo(-finalPayment + finalValueAll, 2)
+    expect(yearData.assets.cash).toBeCloseTo(-finalPayment + finalValueAll, 2)
+    expect(yearData.assets.investments).toBeCloseTo(
+      changeOfStart + changeOfPayments - finalValueAll,
+      2,
+    )
+    expect(yearData.netWorth).toBeCloseTo(changeOfStart + changeOfPayments - finalPayment)
   })
 })

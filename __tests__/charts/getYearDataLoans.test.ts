@@ -38,6 +38,27 @@ describe('loans', () => {
     expect(yearData.netWorth).toBeCloseTo(-yearInterestChange, 2)
   })
 
+  test('Loans first year of existing', () => {
+    const entry: Entry = {
+      ...blankEntry,
+      existing: true,
+      loans_start: 400000,
+      loans_rate: 0.05,
+      loans_periods: 30,
+    }
+    const yearData = getYearDataLoans(entry, 0, 4)
+
+    const yearPayments = pmt(400000, 0.05 / 12, 30 * 12) * 12
+    const yearPrincipalChange = cumprinc(400000, 0.05 / 12, 30 * 12, 1, 12)
+    const yearInterestChange = yearPayments - yearPrincipalChange
+    expect(yearData.operating.expenses).toBeCloseTo(-yearInterestChange, 2)
+    expect(yearData.financing.loans).toBeCloseTo(-yearPrincipalChange, 2)
+
+    expect(yearData.assets.cash).toBeCloseTo(-yearPayments, 2)
+    expect(yearData.liabilities.loans).toBeCloseTo(400000 - yearPrincipalChange, 2)
+    expect(yearData.netWorth).toBeCloseTo(-400000 - yearInterestChange, 2)
+  })
+
   test('Loans first year of 5', () => {
     const entry: Entry = {
       ...blankEntry,

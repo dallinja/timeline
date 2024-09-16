@@ -38,6 +38,7 @@ export type Database = {
           cash_taxable: boolean | null
           created_at: string
           end_year: number | null
+          existing: boolean | null
           id: number
           investments_end: number | null
           investments_rate: number | null
@@ -67,6 +68,7 @@ export type Database = {
           cash_taxable?: boolean | null
           created_at?: string
           end_year?: number | null
+          existing?: boolean | null
           id?: number
           investments_end?: number | null
           investments_rate?: number | null
@@ -96,6 +98,7 @@ export type Database = {
           cash_taxable?: boolean | null
           created_at?: string
           end_year?: number | null
+          existing?: boolean | null
           id?: number
           investments_end?: number | null
           investments_rate?: number | null

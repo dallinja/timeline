@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn'
 import { TableRow, TableHead, TableCell } from '../ui/table'
-import { YearData } from '@/lib/charts/getNetWorthTimeline'
+import { YearData } from '@/lib/charts/types'
 import { formatCurrency } from '@/lib/currency'
 
 export default function DataRow({
