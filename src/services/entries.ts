@@ -15,12 +15,18 @@ export type EntryType = 'income' | 'expense' | 'property' | 'investment' | 'loan
  * READ
  */
 
-export async function getEntries({ userId }: { userId: string }) {
+export async function getEntries({
+  userId,
+  scenario = 'default',
+}: {
+  userId: string
+  scenario?: string
+}) {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('entries')
     .select('*, relatedEntries:entries!parent_id(*)')
-    .match({ user_id: userId })
+    .match({ user_id: userId, scenario })
   // .is('parent_id', null)
   // .returns<>()
   if (error) throw error

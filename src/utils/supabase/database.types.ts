@@ -54,6 +54,7 @@ export type Database = {
           property_end: number | null
           property_rate: number | null
           property_start: number | null
+          scenario: string | null
           start_year: number | null
           sub_type: string | null
           type: string | null
@@ -84,6 +85,7 @@ export type Database = {
           property_end?: number | null
           property_rate?: number | null
           property_start?: number | null
+          scenario?: string | null
           start_year?: number | null
           sub_type?: string | null
           type?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           property_end?: number | null
           property_rate?: number | null
           property_start?: number | null
+          scenario?: string | null
           start_year?: number | null
           sub_type?: string | null
           type?: string | null

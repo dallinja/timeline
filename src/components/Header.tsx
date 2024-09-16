@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ProfileDropdown } from './ProfileDropdown'
 import InitialDataDialog from './InitialDataDialog'
+import ScenarioSelection from './ScenarioSelection'
 
 export default function Header() {
   return (
@@ -8,6 +9,7 @@ export default function Header() {
       <div className="flex w-full items-center justify-between p-3 px-5 text-sm">
         <div className="flex items-center gap-5 font-semibold">
           <Link href={'/'}>Timeline</Link>
+          <ScenarioSelection />
         </div>
         <div className="flex items-center gap-5 font-semibold">
           <InitialDataDialog />

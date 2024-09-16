@@ -27,7 +27,7 @@ function getMinMaxYear(entries: Entry[], maxYearProp: number) {
       }
       return acc
     },
-    { minYear: 9999, maxYear: maxYearProp },
+    { minYear: currentYear, maxYear: maxYearProp },
   )
 }
 
