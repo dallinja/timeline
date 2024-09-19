@@ -1,10 +1,10 @@
-import { Entry } from '@/services/entries'
+import { Entry } from '@/lib/types'
 import { useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Text } from './ui/text'
 import { Divider } from './ui/divider'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/entries'
+import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
 import {
   createYearlyEntries,
   getYearlyFromEntry,

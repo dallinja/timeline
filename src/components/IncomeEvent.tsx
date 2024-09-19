@@ -3,7 +3,7 @@ import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
 import IncomeJobEvent from './IncomeJobEvent'
 import IncomeOneTimeEvent from './IncomeOneTimeEvent'
-import { Entry } from '@/services/entries'
+import { Entry } from '@/lib/types'
 
 export interface IncomeEventProps {
   selectedEvent?: Entry & { relatedEntries?: Entry[] | null }

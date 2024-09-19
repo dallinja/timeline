@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input'
 import PlusCircleIcon from '@/components/icons/PlusCircleIcon'
 import { useState } from 'react'
 import { cn } from '@/lib/cn'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/entries'
+import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
 import { createJobEntries, getJobFromEntry, updateJobEntries } from '@/lib/entries/income/job'
-import { Entry } from '@/services/entries'
+import { Entry } from '@/lib/types'
 
 const DEFAULT_ANNUAL_RAISE_RATE = 0.03
 

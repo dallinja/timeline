@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import CashFlows from './CashFlows'
 import BalanceSheet from './BalanceSheet'
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 import getYearsData from '@/lib/charts/getYearsData'
 // 40 years of data
 type Data = {

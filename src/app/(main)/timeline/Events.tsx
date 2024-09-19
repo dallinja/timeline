@@ -1,7 +1,7 @@
 import EventTypeSummary from '@/components/EventTypeSummary'
-import { Entry, EntryType } from '@/services/entries'
+import { Entry, EntryType } from '@/services/entries.server'
 
-export default function Events({ entries }: { entries: Entry[] }) {
+export default function Events({ entries }: { entries: (Entry & { relatedEntries?: Entry[] })[] }) {
   const events = entries.reduce<Record<EntryType, Entry[]>>(
     (acc, entry) => {
       if (!entry.type) return acc

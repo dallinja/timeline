@@ -1,4 +1,4 @@
-import { Entry, EntryType } from '@/services/entries'
+import { Entry, EntryType } from '@/services/entries.server'
 import { emptyYearData, YearData } from './types'
 import getYearDataCash from './getYearDataCash'
 import getYearDataProperty from './getYearDataProperty'

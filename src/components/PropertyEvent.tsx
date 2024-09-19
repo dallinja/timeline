@@ -1,4 +1,4 @@
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 import { SheetHeader } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
@@ -24,14 +24,10 @@ export default function PropertyEvent({ selectedEvent, onClose }: PropertyEventP
         onValueChange={setPropertyType}
       >
         <SelectItem value="house">House</SelectItem>
-        {/* <SelectItem value="one-time">One-time amount</SelectItem> */}
       </SelectField>
       {propertyType === 'house' && (
         <PropertyHouseEvent selectedEvent={selectedEvent} onClose={onClose} />
       )}
-      {/* {propertyType === 'one-time' && (
-        <PropertyOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
-      )} */}
     </>
   )
 }

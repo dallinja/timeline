@@ -1,7 +1,7 @@
 import getYearDataProperty from '@/lib/charts/getYearDataProperty'
 import { expect, test, describe } from 'vitest'
 import { blankEntry } from './blankEntry'
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 
 describe('property', () => {
   test('Property first year, only one year', () => {

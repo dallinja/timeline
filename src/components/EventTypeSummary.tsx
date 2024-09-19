@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn'
 import { Button, buttonBaseClass } from './ui/button'
 import EditEventButton from './EditEventButton'
 import PlusCircleIcon from './icons/PlusCircleIcon'
-import { Entry, EntryType } from '@/services/entries'
+import { Entry, EntryType } from '@/services/entries.server'
 
 export interface EventTypeSummaryProps {
   eventType?: EntryType

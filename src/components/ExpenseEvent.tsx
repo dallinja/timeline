@@ -1,4 +1,4 @@
-import { Entry } from '@/services/entries'
+import { Entry } from '@/lib/types'
 import { SheetHeader } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'

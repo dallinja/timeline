@@ -1,4 +1,4 @@
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 
 export const blankEntry: Entry = {
   id: 0,

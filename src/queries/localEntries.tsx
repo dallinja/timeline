@@ -1,34 +1,25 @@
+import { CreateEntryInput, DeleteEntryInput, UpdateEntryInput } from '@/lib/types'
 import {
-  CreateEntryInput,
-  DeleteEntriesInput,
-  UpdateEntryInput,
-  UpsertEntryInput,
   createEntries,
   deleteEntries,
   getEntries,
   getEntriesAndSubEntries,
   updateEntries,
   updateEntry,
-} from '@/services/entries.client'
+} from '@/services/local'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-export function useEntries({ userId, scenario }: { userId: string; scenario?: string }) {
+export function useEntries({ scenario }: { scenario: string }) {
   return useQuery({
-    queryKey: ['entries', { userId, scenario }],
-    queryFn: () => getEntries({ userId, scenario }),
+    queryKey: ['entries', { scenario }],
+    queryFn: () => getEntries({ scenario }),
   })
 }
 
-export function useEntriesAndSubEntries({
-  userId,
-  scenario,
-}: {
-  userId: string
-  scenario?: string
-}) {
+export function useEntriesAndSubEntries({ scenario }: { scenario: string }) {
   return useQuery({
     queryKey: ['entries', { scenario, subEntries: true }],
-    queryFn: () => getEntriesAndSubEntries({ userId, scenario }),
+    queryFn: () => getEntriesAndSubEntries({ scenario }),
   })
 }
 
@@ -55,7 +46,7 @@ export function useUpdateEntry() {
 export function useUpdateEntries() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (entriesInput: UpsertEntryInput[]) => updateEntries(entriesInput),
+    mutationFn: (entriesInput: UpdateEntryInput[]) => updateEntries(entriesInput),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entries'] })
     },
@@ -65,7 +56,7 @@ export function useUpdateEntries() {
 export function useDeleteEntries({ skipInvalidation }: { skipInvalidation?: boolean } = {}) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (deleteInput: DeleteEntriesInput) => deleteEntries(deleteInput),
+    mutationFn: (entriesInput: DeleteEntryInput[]) => deleteEntries(entriesInput),
     onSuccess: () => {
       if (skipInvalidation) return
       queryClient.invalidateQueries({ queryKey: ['entries'] })

@@ -1,5 +1,5 @@
 import { CUMPRINC, PMT } from '@/lib/financial'
-import { Entry, EntryType } from '@/services/entries'
+import { Entry, EntryType } from '@/services/entries.server'
 
 const currentYear = new Date().getFullYear()
 

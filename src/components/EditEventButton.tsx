@@ -5,7 +5,7 @@ import IncomeEvent from './IncomeEvent'
 import { useState } from 'react'
 import ExpenseEvent from './ExpenseEvent'
 import PropertyEvent from './PropertyEvent'
-import { Entry, EntryType } from '@/services/entries'
+import { Entry, EntryType } from '@/services/entries.server'
 
 export interface EditEventButtonProps {
   children: React.ReactNode
@@ -18,7 +18,7 @@ export default function EditEventButton({
   eventType: eventTypeProp,
   event,
 }: EditEventButtonProps) {
-  const eventType = eventTypeProp || event?.type
+  const eventType = eventTypeProp || (event?.type as EntryType)
   const [open, setOpen] = useState(false)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -45,9 +45,11 @@ function EditEventDialogContent({
 }) {
   switch (eventType) {
     case 'income':
-      return <IncomeEvent selectedEvent={event} onClose={onClose} />
+      return 'hey'
+    // return <IncomeEvent selectedEvent={event} onClose={onClose} />
     case 'expense':
-      return <ExpenseEvent selectedEvent={event} onClose={onClose} />
+      return 'hey'
+    // return <ExpenseEvent selectedEvent={event} onClose={onClose} />
     case 'property':
       return <PropertyEvent selectedEvent={event} onClose={onClose} />
     default:

@@ -1,4 +1,4 @@
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 import { emptyYearData, YearData } from './types'
 import { cumprinc, fv, fvGrowingAnnuity, pmt } from '../financial'
 import checkYearData from './checkYearData'

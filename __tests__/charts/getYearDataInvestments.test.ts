@@ -1,7 +1,7 @@
 import getYearDataInvestments from '@/lib/charts/getYearDataInvestments'
 import { expect, test, describe } from 'vitest'
 import { blankEntry } from './blankEntry'
-import { Entry } from '@/services/entries'
+import { Entry } from '@/services/entries.server'
 import { fv, fvGrowingAnnuity } from '@/lib/financial'
 
 describe('investments', () => {

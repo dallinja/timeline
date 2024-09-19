@@ -11,29 +11,29 @@ import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/
 import {
   HouseEntryInput,
   createHouseEntries,
-  getHouseFromEntry,
+  getHouseFromEvent,
   updateHouseEntries,
 } from '@/lib/entries/property/house'
-import { Entry } from '@/services/entries'
+import { Entry, EventEntries } from '@/services/entries.server'
+import { roundToDec } from '@/lib/number'
+import { useCreateHouse } from '@/lib/entries/property/useCreateHouse'
+import { useUpdateHouse } from '@/lib/entries/property/useUpdateHouse'
+import usePropertyHouseEvent from '@/lib/entries/property/usePropertyHouseEvent'
 
 const DEFAULT_APPRECIATION_RATE = 0.03
 
-function getCurrentOwn(entry?: HouseEntryInput) {
-  return !!entry?.cashStart ?? true
-}
-
 function getIncludeMortgage(entry?: HouseEntryInput) {
-  return !!entry?.includeMortgage ?? true
+  return !!entry?.mortgageAmount
 }
 
 export interface PropertyHouseEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
 export default function PropertyHouseEvent({ selectedEvent, onClose }: PropertyHouseEventProps) {
-  const house = getHouseFromEntry(selectedEvent)
-  const [currentHome, setCurrentHome] = useState(() => getCurrentOwn(house))
+  const house = getHouseFromEvent(selectedEvent)
+  const [currentHome, setCurrentHome] = useState(house?.existing ?? false)
   const [includeMortgage, setIncludeMortgage] = useState(() => getIncludeMortgage(house))
 
   const [name, setName] = useState(house?.name ?? '')
@@ -46,66 +46,85 @@ export default function PropertyHouseEvent({ selectedEvent, onClose }: PropertyH
       : String(DEFAULT_APPRECIATION_RATE * 100),
   )
   const [annualExpenses, setAnnualExpenses] = useState(house?.annualExpenses ?? '')
-  const [downPayment, setDownPayment] = useState(house?.downPayment ?? '')
-  const [mortgageAmount, setMortgageAmount] = useState(house?.mortgageAmount ?? true)
+  const [annualExpensesRate, setAnnualExpensesRate] = useState(house?.annualExpensesRate ?? '')
+  const [downPayment, setDownPayment] = useState(
+    house?.existing ? '' : (house?.houseValue ?? 0) - (house?.mortgageAmount ?? 0) || '',
+  )
+  const [mortgageAmount, setMortgageAmount] = useState(house?.mortgageAmount ?? '')
   const [mortgageYears, setMortgageYears] = useState(house?.mortgageYears ?? '')
   const [mortgageRate, setMortgageRate] = useState(house?.mortgageRate ?? '')
 
-  const { mutate: createEntries } = useCreateEntries()
-  const { mutate: updateEntries } = useUpdateEntries()
+  const { mutate: createHouseEvent } = useCreateHouse()
+  const { mutate: updateHouseEvent } = useUpdateHouse()
   const { mutate: deleteEntries } = useDeleteEntries()
 
   const handleSave = () => {
     if (!startYear || !endYear) return
-    const entries = createHouseEntries({
-      scenario: 'default',
-      name,
-      startYear: Number(startYear),
-      endYear: Number(endYear),
-      amount: Number(houseValue),
-      appreciationRate: Number(appreciationRate) / 100,
-      startingBonus: Number(annualExpenses),
-      annualDonationRate: Number(donationRate) / 100,
-    })
-    createEntries(entries, {
-      onError: (err) => {
-        console.log('err: ', err)
-      },
-      onSuccess: () => {
-        onClose && onClose()
-      },
-    })
-  }
-
-  const handleUpdate = () => {
-    if (!startYear || !endYear || !selectedEvent) return
-    const entries = updateHouseEntries(
+    createHouseEvent(
       {
+        userId: '1',
         scenario: 'default',
         name,
         startYear: Number(startYear),
         endYear: Number(endYear),
-        amount: Number(houseValue),
-        appreciationRate: Number(appreciationRate) / 100,
-        startingBonus: Number(annualExpenses),
-        annualDonationRate: Number(donationRate) / 100,
+        existing: currentHome,
+        houseValue: Number(houseValue),
+        annualAppreciationRate: roundToDec(Number(appreciationRate) / 100, 4),
+        annualExpenses: Number(annualExpenses),
+        annualExpensesRate: roundToDec(Number(annualExpensesRate) / 100, 4),
+        mortgageAmount: currentHome
+          ? Number(mortgageAmount)
+          : Number(houseValue) - Number(downPayment),
+        mortgageYears: Number(mortgageYears),
+        mortgageRate: Number(mortgageRate),
       },
-      selectedEvent,
+      {
+        onSuccess: () => {
+          onClose && onClose()
+        },
+      },
     )
-    updateEntries(entries, {
-      onSuccess: () => {
-        onClose && onClose()
+  }
+
+  const handleUpdate = () => {
+    if (!startYear || !endYear || !selectedEvent) return
+    updateHouseEvent(
+      {
+        input: {
+          userId: '1',
+          scenario: 'default',
+          name,
+          startYear: Number(startYear),
+          endYear: Number(endYear),
+          existing: currentHome,
+          houseValue: Number(houseValue),
+          annualAppreciationRate: roundToDec(Number(appreciationRate) / 100, 4),
+          annualExpenses: Number(annualExpenses),
+          annualExpensesRate: roundToDec(Number(annualExpensesRate) / 100, 4),
+          mortgageAmount: Number(mortgageAmount),
+          mortgageYears: Number(mortgageYears),
+          mortgageRate: Number(mortgageRate),
+        },
+        selectedEvent,
       },
-    })
+      {
+        onSuccess: () => {
+          onClose && onClose()
+        },
+      },
+    )
   }
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteEntries([{ id: selectedEvent.id }], {
-      onSuccess: () => {
-        onClose && onClose()
+    deleteEntries(
+      { ids: [selectedEvent.id] },
+      {
+        onSuccess: () => {
+          onClose && onClose()
+        },
       },
-    })
+    )
   }
 
   return (

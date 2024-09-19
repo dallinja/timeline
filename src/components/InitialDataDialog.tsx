@@ -16,7 +16,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { Switch } from './ui/switch'
 import { createTimeline } from '@/actions/createTimeline'
 import { getEntries } from '@/services/local'
-import { useCreateEntries, useDeleteEntries } from '@/queries/entries'
+import { useCreateEntries, useDeleteEntries } from '@/queries/localEntries'
 
 export interface InitialDataDialogProps {
   children?: React.ReactNode
