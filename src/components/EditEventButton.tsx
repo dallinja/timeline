@@ -58,8 +58,14 @@ function EditEventDialogContent({
   const renderSwitch = (eventType?: EntryType | null) => {
     switch (eventType) {
       case 'income':
-        return null
-      // return <IncomeEvent selectedEvent={event} onClose={onClose} />
+        return (
+          <IncomeEvent
+            userId={userId}
+            scenario={scenario}
+            selectedEvent={event}
+            onClose={onClose}
+          />
+        )
       case 'expense':
         return null
       // return <ExpenseEvent selectedEvent={event} onClose={onClose} />

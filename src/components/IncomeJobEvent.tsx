@@ -1,57 +1,43 @@
 'use client'
 
-import { Button, buttonBaseClass } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Divider } from '@/components/ui/divider'
 import { Switch } from '@/components/ui/switch'
 import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
-import PlusCircleIcon from '@/components/icons/PlusCircleIcon'
-import { useState } from 'react'
-import { cn } from '@/lib/cn'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
-import { createJobEntries, getJobFromEntry, updateJobEntries } from '@/lib/entries/income/job'
-import { Entry } from '@/lib/types'
+import { createJobEntries, updateJobEntries } from '@/lib/entries/income/job'
+import useIncomeJobEvent from '@/lib/entries/income/useIncomeJobEvent'
+import {
+  useCreateEventEntries,
+  useDeleteEventEntries,
+  useUpdateEventEntries,
+} from '@/lib/entries/useEntries'
+import { EventEntries } from '@/services/entries.client'
 
 const DEFAULT_ANNUAL_RAISE_RATE = 0.03
 
 export interface IncomeJobEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEventProps) {
-  const job = getJobFromEntry(selectedEvent)
-  const [name, setName] = useState(job?.name ?? '')
-  const [startYear, setStartYear] = useState(job?.startYear ?? '')
-  const [endYear, setEndYear] = useState(job?.endYear ?? '')
-  const [salary, setSalary] = useState(job?.annualAmount ?? '')
-  const [raiseRate, setRaiseRate] = useState(
-    job?.annualRaiseRate ? job.annualRaiseRate * 100 : String(DEFAULT_ANNUAL_RAISE_RATE * 100),
-  )
-  const [signingBonus, setSigningBonus] = useState(job?.startingBonus ?? '')
-  const [includeTaxes, setIncludeTaxes] = useState(job?.taxable ?? true)
-  const [donationRate, setDonationRate] = useState(
-    job?.annualDonationRate ? job.annualDonationRate * 100 : '',
-  )
+export default function IncomeJobEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: IncomeJobEventProps) {
+  const [state, dispatch, jobEntryInput] = useIncomeJobEvent(userId, scenario, selectedEvent)
 
-  const { mutate: createEntries } = useCreateEntries()
-  const { mutate: updateEntries } = useUpdateEntries()
-  const { mutate: deleteEntries } = useDeleteEntries()
+  const { mutate: createJobEvent } = useCreateEventEntries(createJobEntries)
+  const { mutate: updateJobEvent } = useUpdateEventEntries(updateJobEntries)
+  const { mutate: deleteJobEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
-    if (!startYear || !endYear) return
-    const entries = createJobEntries({
-      scenario: 'default',
-      name,
-      startYear: Number(startYear),
-      endYear: Number(endYear),
-      annualAmount: Number(salary),
-      taxable: includeTaxes,
-      annualRaiseRate: Number(raiseRate) / 100,
-      startingBonus: Number(signingBonus),
-      annualDonationRate: Number(donationRate) / 100,
-    })
-    createEntries(entries, {
+    if (!state.startYear || !state.endYear) return
+    createJobEvent(jobEntryInput, {
       onError: (err) => {
         console.log('err: ', err)
       },
@@ -62,31 +48,21 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
   }
 
   const handleUpdate = () => {
-    if (!startYear || !endYear || !selectedEvent) return
-    const entries = updateJobEntries(
+    if (!state.startYear || !state.endYear || !selectedEvent) return
+    const entries = updateJobEntries(jobEntryInput, selectedEvent)
+    updateJobEvent(
+      { input: jobEntryInput, selectedEvent },
       {
-        scenario: 'default',
-        name,
-        startYear: Number(startYear),
-        endYear: Number(endYear),
-        annualAmount: Number(salary),
-        taxable: includeTaxes,
-        annualRaiseRate: Number(raiseRate) / 100,
-        startingBonus: Number(signingBonus),
-        annualDonationRate: Number(donationRate) / 100,
+        onSuccess: () => {
+          onClose && onClose()
+        },
       },
-      selectedEvent,
     )
-    updateEntries(entries, {
-      onSuccess: () => {
-        onClose && onClose()
-      },
-    })
   }
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteEntries([{ id: selectedEvent.id }], {
+    deleteJobEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -98,8 +74,8 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
       <Input
         className="mb-2"
         label="Job name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={state.name}
+        onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text className="mt-6" bold>
         Job details
@@ -112,44 +88,35 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          value={startYear}
-          onChange={(e) => setStartYear(e.target.value)}
+          value={state.startYear}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value: e.target.value })
+          }
         />
         <Input
           className="mb-2"
           label="End year"
-          value={endYear}
-          onChange={(e) => setEndYear(e.target.value)}
+          value={state.endYear}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
+          }
         />
       </div>
       <Input
         className="mb-2"
         label="Starting annual salary"
-        value={salary}
-        onChange={(e) => setSalary(e.target.value)}
+        value={state.annualSalary}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'annualSalary', value: e.target.value })
+        }
       />
       <Text fontSize="sm" className="flex items-center justify-between font-semibold">
         Is this taxable?
-        <Switch checked={includeTaxes} onCheckedChange={setIncludeTaxes} />
+        <Switch
+          checked={state.taxable}
+          onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
+        />
       </Text>
-      {/* <Text className="mt-6" bold>
-        Job promotions
-      </Text>
-      <Divider className="mb-2" />
-      <div>
-        <button className={cn(buttonBaseClass, 'flex items-center')}>
-          <PlusCircleIcon color="#888" fontSize="sm" />
-          <Text className="ml-1" color="#888" fontSize="xs" bold>
-            Add promotion
-          </Text>
-        </button>
-      </div> */}
-      {/* {promotions.map((event) => (
-            <div key={event.year} className="mb-2 grid grid-cols-[60px,1fr] gap-2">
-              <Text>{event.year}</Text>
-              <Text className="text-right">{formatCurrency(event.amount, true)}</Text>
-            </div>
-          ))} */}
       <Text className="mt-6" bold>
         Other details
       </Text>
@@ -157,14 +124,18 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
       <Input
         className="mb-2"
         label="Annual raise rate (%)"
-        value={raiseRate}
-        onChange={(e) => setRaiseRate(e.target.value)}
+        value={state.annualRaiseRate}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'annualRaiseRate', value: e.target.value })
+        }
       />
       <Input
         className="mb-2"
         label="Signing bonus"
-        value={signingBonus}
-        onChange={(e) => setSigningBonus(e.target.value)}
+        value={state.startingBonus}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'startingBonus', value: e.target.value })
+        }
       />
       <Text className="mt-6" bold>
         Related expenses
@@ -173,8 +144,10 @@ export default function IncomeJobEvent({ selectedEvent, onClose }: IncomeJobEven
       <Input
         className="mb-2"
         label="Annual donation percentage"
-        value={donationRate}
-        onChange={(e) => setDonationRate(e.target.value)}
+        value={state.annualDonationRate}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'annualDonationRate', value: e.target.value })
+        }
       />
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (

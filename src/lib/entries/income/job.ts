@@ -1,158 +1,114 @@
-import {
-  CreateEntryInput,
-  Entry,
-  EventEntries,
-  UpdateEntryInput,
-  UpsertEntryInput,
-} from '@/lib/types'
+import { CreateEntryInput, EventEntries, UpsertEntryInput } from '@/services/entries.client'
 
-type JobEntryInput = {
+export type JobEntryInput = {
+  userId: string
   scenario: string
   name: string
   startYear: number
   endYear: number
-  annualAmount: number
-  taxable?: boolean
+  annualSalary: number
   annualRaiseRate?: number
+  taxable?: boolean
   startingBonus?: number
   annualDonationRate?: number
-  promotions?: {
-    startYear: number
-    amount?: number
-    increaseAmount?: number
-    increaseRate?: number
-  }[]
 }
 
 export function createJobEntries(
   input: JobEntryInput,
-): (CreateEntryInput & { related_entries?: CreateEntryInput[] })[] {
+): [CreateEntryInput, CreateEntryInput[], null] {
   return buildJobEntries(input)
 }
 
 export function updateJobEntries(
   input: JobEntryInput,
   selectedEvent: EventEntries,
-): (UpdateEntryInput & { related_entries?: UpsertEntryInput[] })[] {
+): [UpsertEntryInput, (CreateEntryInput | UpsertEntryInput)[], { ids: number[] } | null] {
   return buildJobEntries(input, selectedEvent)
 }
 
-function buildJobEntries(
-  input: JobEntryInput,
-): (CreateEntryInput & { related_entries?: CreateEntryInput[] })[]
+function buildJobEntries(input: JobEntryInput): [CreateEntryInput, CreateEntryInput[], null]
 function buildJobEntries(
   input: JobEntryInput,
   selectedEvent: EventEntries,
-): (UpdateEntryInput & { related_entries?: UpsertEntryInput[] })[]
+): [UpsertEntryInput, (CreateEntryInput | UpsertEntryInput)[], { ids: number[] } | null]
+
 function buildJobEntries(
   {
+    userId,
     scenario,
     name,
     startYear,
     endYear,
-    annualAmount,
-    taxable = false,
+    annualSalary,
     annualRaiseRate,
+    taxable = false,
     startingBonus,
     annualDonationRate,
   }: JobEntryInput,
   selectedEvent?: EventEntries,
-):
-  | (CreateEntryInput & { related_entries?: CreateEntryInput[] })[]
-  | (UpdateEntryInput & { related_entries?: UpsertEntryInput[] })[] {
-  const annualDonationEntry = selectedEvent?.relatedEntries?.find(
+): [
+  CreateEntryInput | UpsertEntryInput,
+  (CreateEntryInput | UpsertEntryInput)[],
+  { ids: number[] } | null,
+] {
+  const entry: CreateEntryInput | UpsertEntryInput = {
+    ...(selectedEvent ? { id: selectedEvent.id } : {}),
+    user_id: userId,
+    scenario,
+    name,
+    type: 'income',
+    sub_type: 'job',
+    start_year: startYear,
+    end_year: endYear,
+    ...(startingBonus ? { cash_start: startingBonus } : {}),
+    ...(annualSalary ? { cash_recurring: annualSalary } : {}),
+    ...(annualRaiseRate ? { cash_recurring_rate: annualRaiseRate } : {}),
+    ...(taxable ? { cash_taxable: true } : {}),
+  }
+
+  const relatedDonation = selectedEvent?.relatedEntries?.find(
     (ent) => ent.sub_type === 'annual-donation',
   )
-  const relatedEntries: UpsertEntryInput[] = [
-    ...(annualDonationRate
-      ? [
-          {
-            ...baseEntry,
-            ...(annualDonationEntry ? { id: annualDonationEntry.id } : {}),
-            scenario,
-            name: 'Annual donation',
-            type: 'expense' as CreateEntryInput['type'],
-            sub_type: 'annual-donation' as CreateEntryInput['sub_type'],
-            start_year: startYear,
-            end_year: endYear,
-            cash_recurring: -annualAmount * annualDonationRate,
-            ...(annualRaiseRate ? { cash_recurring_rate: annualRaiseRate } : {}),
-            ...(selectedEvent ? { parent_id: selectedEvent.id } : {}),
-          },
-        ]
-      : []),
-  ]
-  return [
-    {
-      ...baseEntry,
-      ...(selectedEvent ? { id: selectedEvent.id } : {}),
+  const relatedEntries: (CreateEntryInput | UpsertEntryInput)[] = []
+
+  if (annualDonationRate) {
+    const donationEntry: CreateEntryInput | UpsertEntryInput = {
+      ...(relatedDonation ? { id: relatedDonation.id } : {}),
+      user_id: userId,
       scenario,
-      name,
-      type: 'income',
-      sub_type: 'job',
+      name: 'Annual donation',
+      type: 'expense' as CreateEntryInput['type'],
+      sub_type: 'annual-donation' as CreateEntryInput['sub_type'],
       start_year: startYear,
       end_year: endYear,
-      ...(startingBonus ? { cash_start: startingBonus } : {}),
-      ...(annualAmount ? { cash_recurring: annualAmount } : {}),
+      cash_recurring: -annualSalary * annualDonationRate,
       ...(annualRaiseRate ? { cash_recurring_rate: annualRaiseRate } : {}),
-      ...(taxable ? { cash_taxable: true } : {}),
-      ...(relatedEntries.length > 0 ? { related_entries: relatedEntries } : {}),
-    },
-  ]
+      ...(selectedEvent ? { parent_id: selectedEvent.id } : {}),
+    }
+    relatedEntries.push(donationEntry)
+  }
+
+  const deletedEntries =
+    relatedDonation && !annualDonationRate ? { ids: [relatedDonation.id] } : null
+
+  return [entry, relatedEntries, deletedEntries]
 }
 
-export function getJobFromEntry(event?: EventEntries): JobEntryInput | undefined {
+export function getJobFromEvent(event?: EventEntries): JobEntryInput | undefined {
   if (!event) return undefined
-  const annualDonationEntry = event.relatedEntries?.find(
-    (ent) => ent.sub_type === 'annual-donation',
-  )
+  const relatedDonation = event.relatedEntries?.find((ent) => ent.sub_type === 'annual-donation')
   return {
-    scenario: event.scenario,
+    userId: event.user_id,
+    scenario: event.scenario ?? '',
     name: event.name ?? '',
     startYear: event.start_year ?? 0,
     endYear: event.end_year ?? 0,
-    annualAmount: event.cash_recurring ?? 0,
-    taxable: event.cash_taxable,
-    annualRaiseRate: event.cash_recurring_rate ?? undefined,
-    startingBonus: event.cash_start ?? undefined,
-    annualDonationRate: annualDonationEntry
-      ? (annualDonationEntry.cash_recurring || 0) / -(event.cash_recurring ?? 1)
+    annualSalary: event.cash_recurring ?? 0,
+    taxable: event.cash_taxable ?? false,
+    annualRaiseRate: event.cash_recurring_rate ?? 0,
+    startingBonus: event.cash_start ?? 0,
+    annualDonationRate: relatedDonation
+      ? (relatedDonation.cash_recurring ?? 0) / -(event.cash_recurring ?? 1)
       : undefined,
-    // promotions: {
-    //   startYear: event.cash_rate,
-    //   amount: event.cash_rate,
-    //   increaseAmount: event.cash_rate,
-    //   increaseRate: event.cash_rate,
-    // }[]
   }
-}
-
-const baseEntry: CreateEntryInput = {
-  name: '',
-  parent_id: null,
-  type: 'income',
-  sub_type: 'job',
-  user_id: '1',
-  scenario: 'default',
-
-  start_year: 0,
-  end_year: 0,
-
-  cash_start: 0,
-  cash_rate: 0,
-  cash_recurring: 0,
-  cash_recurring_rate: 0,
-  cash_taxable: false,
-
-  property_start: 0,
-  property_rate: 0,
-
-  investments_start: 0,
-  investments_rate: 0,
-  investments_recurring: 0,
-  investments_recurring_rate: 0,
-
-  loans_start: 0,
-  loans_rate: 0,
-  loans_periods: 0,
 }

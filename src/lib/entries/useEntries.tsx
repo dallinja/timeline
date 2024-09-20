@@ -1,4 +1,3 @@
-import { createHouseEntries, HouseEntryInput, updateHouseEntries } from './house'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createEntries,
@@ -9,13 +8,15 @@ import {
   UpsertEntryInput,
 } from '@/services/entries.client'
 
-export function useCreateHouse() {
+export function useCreateEventEntries<T>(
+  gatherEntries: (input: T) => [CreateEntryInput, CreateEntryInput[], null],
+) {
   // const { user } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (input: HouseEntryInput) => {
-      const [entry, relatedEntries] = createHouseEntries(input)
+    mutationFn: async (input: T) => {
+      const [entry, relatedEntries] = gatherEntries(input)
 
       const data = await createEntries([entry])
       const mainEntry = data[0]
@@ -37,13 +38,18 @@ export function useCreateHouse() {
   })
 }
 
-export function useUpdateHouse() {
+export function useUpdateEventEntries<T>(
+  gatherEntries: (
+    input: T,
+    selectedEvent: EventEntries,
+  ) => [UpsertEntryInput, (CreateEntryInput | UpsertEntryInput)[], { ids: number[] } | null],
+) {
   // const { user } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (input: { input: HouseEntryInput; selectedEvent: EventEntries }) => {
-      const [entry, relatedEntries, entriesToDelete] = updateHouseEntries(
+    mutationFn: async (input: { input: T; selectedEvent: EventEntries }) => {
+      const [entry, relatedEntries, entriesToDelete] = gatherEntries(
         input.input,
         input.selectedEvent,
       )
@@ -79,7 +85,7 @@ export function useUpdateHouse() {
   })
 }
 
-export function useDeleteHouse() {
+export function useDeleteEventEntries() {
   const queryClient = useQueryClient()
 
   return useMutation({

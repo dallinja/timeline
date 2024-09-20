@@ -1,4 +1,4 @@
-import { CreateEntryInput, EventEntries, UpsertEntryInput } from '@/services/entries.server'
+import { CreateEntryInput, EventEntries, UpsertEntryInput } from '@/services/entries.client'
 
 export type HouseEntryInput = {
   userId: string
@@ -92,6 +92,7 @@ function buildHouseEntries(
       loans_start: mortgageAmount,
       loans_rate: mortgageRate,
       loans_periods: mortgageYears,
+      ...(selectedEvent ? { parent_id: selectedEvent.id } : {}),
     }
     relatedEntries.push(loadEntry)
   }

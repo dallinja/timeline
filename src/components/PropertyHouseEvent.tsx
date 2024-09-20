@@ -5,15 +5,16 @@ import { Divider } from '@/components/ui/divider'
 import { Switch } from '@/components/ui/switch'
 import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
-import { EventEntries } from '@/services/entries.server'
-import {
-  useCreateHouse,
-  useUpdateHouse,
-  useDeleteHouse,
-} from '@/lib/entries/property/usePropertyHouseEntries'
+import { EventEntries } from '@/services/entries.client'
 import usePropertyHouseEvent from '@/lib/entries/property/usePropertyHouseEvent'
 import Collapse from './ui/collapse'
 import { revalidatePath } from 'next/cache'
+import {
+  useCreateEventEntries,
+  useUpdateEventEntries,
+  useDeleteEventEntries,
+} from '@/lib/entries/useEntries'
+import { createHouseEntries, updateHouseEntries } from '@/lib/entries/property/house'
 
 export interface PropertyHouseEventProps {
   userId: string
@@ -30,9 +31,9 @@ export default function PropertyHouseEvent({
 }: PropertyHouseEventProps) {
   const [state, dispatch, houseEntryInput] = usePropertyHouseEvent(userId, scenario, selectedEvent)
 
-  const { mutate: createHouseEvent } = useCreateHouse()
-  const { mutate: updateHouseEvent } = useUpdateHouse()
-  const { mutate: deleteHouseEvent } = useDeleteHouse()
+  const { mutate: createHouseEvent } = useCreateEventEntries(createHouseEntries)
+  const { mutate: updateHouseEvent } = useUpdateEventEntries(updateHouseEntries)
+  const { mutate: deleteHouseEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
     if (!state.startYear || !state.endYear) return

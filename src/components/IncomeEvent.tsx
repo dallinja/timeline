@@ -1,20 +1,25 @@
-import { SheetHeader } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
 import IncomeJobEvent from './IncomeJobEvent'
 import IncomeOneTimeEvent from './IncomeOneTimeEvent'
-import { Entry } from '@/lib/types'
+import { EventEntries } from '@/services/entries.client'
 
 export interface IncomeEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function IncomeEvent({ selectedEvent, onClose }: IncomeEventProps) {
+export default function IncomeEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: IncomeEventProps) {
   const [incomeType, setIncomeType] = useState(selectedEvent?.sub_type ?? '')
   return (
     <>
-      <SheetHeader>{selectedEvent ? 'Edit' : 'Add'} Income</SheetHeader>
       <SelectField
         id="income-type"
         className="mb-4"
@@ -27,10 +32,18 @@ export default function IncomeEvent({ selectedEvent, onClose }: IncomeEventProps
         <SelectItem value="job">Job</SelectItem>
         <SelectItem value="one-time">One-time amount</SelectItem>
       </SelectField>
-      {incomeType === 'job' && <IncomeJobEvent selectedEvent={selectedEvent} onClose={onClose} />}
-      {incomeType === 'one-time' && (
-        <IncomeOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
+      {incomeType === 'job' && (
+        <IncomeJobEvent
+          userId={userId}
+          scenario={scenario}
+          selectedEvent={selectedEvent}
+          onClose={onClose}
+        />
       )}
+      {
+        incomeType === 'one-time' && null
+        // <IncomeOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
+      }
     </>
   )
 }
