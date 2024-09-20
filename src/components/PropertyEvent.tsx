@@ -1,19 +1,25 @@
 import { Entry } from '@/services/entries.server'
-import { SheetHeader } from './ui/sheet'
+import { SheetHeader, SheetTitle } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
 import PropertyHouseEvent from './PropertyHouseEvent'
 
 export interface PropertyEventProps {
+  userId: string
+  scenario: string
   selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
   onClose?: () => void
 }
 
-export default function PropertyEvent({ selectedEvent, onClose }: PropertyEventProps) {
+export default function PropertyEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: PropertyEventProps) {
   const [propertyType, setPropertyType] = useState(selectedEvent?.sub_type ?? '')
   return (
     <>
-      <SheetHeader>{selectedEvent ? 'Edit' : 'Add'} Property</SheetHeader>
       <SelectField
         id="property-type"
         className="mb-4"
@@ -26,7 +32,12 @@ export default function PropertyEvent({ selectedEvent, onClose }: PropertyEventP
         <SelectItem value="house">House</SelectItem>
       </SelectField>
       {propertyType === 'house' && (
-        <PropertyHouseEvent selectedEvent={selectedEvent} onClose={onClose} />
+        <PropertyHouseEvent
+          userId={userId}
+          scenario={scenario}
+          selectedEvent={selectedEvent}
+          onClose={onClose}
+        />
       )}
     </>
   )

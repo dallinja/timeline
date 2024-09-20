@@ -12,12 +12,11 @@ export default async function Timeline({
 }) {
   const scenario = (searchParams.scenario as string) ?? 'default'
   const supabase = createClient()
-  const user = await supabase.auth.getUser()
-  const entries = await getEntries({ userId: user.data.user?.id ?? '', scenario })
-  const entriesAndSubEntries = await getEntriesAndSubEntries({
-    userId: user.data.user?.id ?? '',
-    scenario: scenario,
-  })
+  const userId = (await supabase.auth.getUser()).data.user?.id
+  if (!userId) return null
+
+  const entries = await getEntries({ userId, scenario })
+  const entriesAndSubEntries = await getEntriesAndSubEntries({ userId, scenario: scenario })
 
   // if (!entries) return <InitialDataDialog />
 
@@ -26,7 +25,7 @@ export default async function Timeline({
       <div className="w-full p-8">
         <NetWorthChart entries={entries} maxYear={2086} />
         <TabGroup
-          Events={<Events entries={entriesAndSubEntries} />}
+          Events={<Events entries={entriesAndSubEntries} userId={userId} scenario={scenario} />}
           Breakdown={<Breakdown entries={entries} />}
         />
       </div>

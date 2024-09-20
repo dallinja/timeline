@@ -1,4 +1,4 @@
-import { updateHouseEntries, HouseEntryInput } from './house'
+import { createHouseEntries, HouseEntryInput, updateHouseEntries } from './house'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createEntries,
@@ -8,6 +8,34 @@ import {
   updateEntries,
   UpsertEntryInput,
 } from '@/services/entries.client'
+
+export function useCreateHouse() {
+  // const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: HouseEntryInput) => {
+      const [entry, relatedEntries] = createHouseEntries(input)
+
+      const data = await createEntries([entry])
+      const mainEntry = data[0]
+      if (!mainEntry) {
+        throw new Error('Failed to create entry')
+      }
+
+      const otherEntries =
+        relatedEntries.length > 0
+          ? await createEntries(
+              relatedEntries.map((relEntry) => ({ ...relEntry, parent_id: mainEntry.id })),
+            )
+          : []
+      return { ...mainEntry, relatedEntries: otherEntries }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entries'] })
+    },
+  })
+}
 
 export function useUpdateHouse() {
   // const { user } = useAuth()
@@ -44,6 +72,21 @@ export function useUpdateHouse() {
       otherEntries.push(...data.filter((entry) => entry.id !== input.selectedEvent.id))
 
       return { ...mainEntry, relatedEntries: otherEntries }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entries'] })
+    },
+  })
+}
+
+export function useDeleteHouse() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (selectedEvent: EventEntries) => {
+      const loan = selectedEvent.relatedEntries?.find((ent) => ent.type === 'loan')
+      const ids = [selectedEvent.id, ...(loan ? [loan.id] : [])]
+      return deleteEntries({ ids })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entries'] })

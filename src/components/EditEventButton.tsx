@@ -1,6 +1,6 @@
 'use client'
 
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet'
 import IncomeEvent from './IncomeEvent'
 import { useState } from 'react'
 import ExpenseEvent from './ExpenseEvent'
@@ -8,12 +8,16 @@ import PropertyEvent from './PropertyEvent'
 import { Entry, EntryType } from '@/services/entries.server'
 
 export interface EditEventButtonProps {
+  userId: string
+  scenario: string
   children: React.ReactNode
   eventType?: EntryType
   event?: Entry & { relatedEntries?: Entry[] }
 }
 
 export default function EditEventButton({
+  userId,
+  scenario,
   children,
   eventType: eventTypeProp,
   event,
@@ -23,8 +27,10 @@ export default function EditEventButton({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent>
+      <SheetContent aria-describedby={undefined}>
         <EditEventDialogContent
+          userId={userId}
+          scenario={scenario}
           eventType={eventType}
           event={event}
           onClose={() => setOpen(false)}
@@ -35,24 +41,50 @@ export default function EditEventButton({
 }
 
 function EditEventDialogContent({
+  userId,
+  scenario,
   eventType,
   event,
   onClose,
 }: {
+  userId: string
+  scenario: string
   eventType?: EntryType | null
   event?: Entry & { relatedEntries?: Entry[] | null }
   onClose?: () => void
 }) {
-  switch (eventType) {
-    case 'income':
-      return 'hey'
-    // return <IncomeEvent selectedEvent={event} onClose={onClose} />
-    case 'expense':
-      return 'hey'
-    // return <ExpenseEvent selectedEvent={event} onClose={onClose} />
-    case 'property':
-      return <PropertyEvent selectedEvent={event} onClose={onClose} />
-    default:
-      return 'hey'
+  const eventTypeTitle = eventType ? eventType.charAt(0).toUpperCase() + eventType.slice(1) : ''
+
+  const renderSwitch = (eventType?: EntryType | null) => {
+    switch (eventType) {
+      case 'income':
+        return null
+      // return <IncomeEvent selectedEvent={event} onClose={onClose} />
+      case 'expense':
+        return null
+      // return <ExpenseEvent selectedEvent={event} onClose={onClose} />
+      case 'property':
+        return (
+          <PropertyEvent
+            userId={userId}
+            scenario={scenario}
+            selectedEvent={event}
+            onClose={onClose}
+          />
+        )
+      default:
+        return null
+    }
   }
+
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle>
+          {event ? 'Edit' : 'Add'} {eventTypeTitle}
+        </SheetTitle>
+      </SheetHeader>
+      {renderSwitch(eventType)}
+    </>
+  )
 }

@@ -64,7 +64,7 @@ function buildHouseEntries(
     user_id: userId,
     scenario,
     name,
-    type: 'income',
+    type: 'property',
     sub_type: 'house',
     start_year: startYear,
     end_year: endYear,

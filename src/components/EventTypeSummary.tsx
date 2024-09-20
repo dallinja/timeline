@@ -7,6 +7,8 @@ import PlusCircleIcon from './icons/PlusCircleIcon'
 import { Entry, EntryType } from '@/services/entries.server'
 
 export interface EventTypeSummaryProps {
+  userId: string
+  scenario: string
   eventType?: EntryType
   title?: React.ReactNode
   events?: (Entry & { relatedEntries?: Entry[] })[]
@@ -14,6 +16,8 @@ export interface EventTypeSummaryProps {
 }
 
 export default function EventTypeSummary({
+  userId,
+  scenario,
   eventType,
   title,
   events,
@@ -25,14 +29,14 @@ export default function EventTypeSummary({
     <div className="rounded-xl border px-4 py-3">
       <div className="-mt-1 mb-4 flex items-center justify-between">
         <Text bold>{title}</Text>
-        <EditEventButton eventType={eventType}>
+        <EditEventButton userId={userId} scenario={scenario} eventType={eventType}>
           <Button variant="ghost" icon align="end">
             <PlusCircleIcon />
           </Button>
         </EditEventButton>
       </div>
       {events?.map((event) => (
-        <EditEventButton key={event.name} event={event}>
+        <EditEventButton userId={userId} scenario={scenario} key={event.name} event={event}>
           <div
             className={cn(
               buttonBaseClass,

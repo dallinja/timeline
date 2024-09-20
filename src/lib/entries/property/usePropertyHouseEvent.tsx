@@ -1,6 +1,7 @@
 import { useReducer } from 'react'
 import { getHouseFromEvent, HouseEntryInput } from './house'
 import { EventEntries } from '@/services/entries.client'
+import { roundToDec } from '@/lib/number'
 
 const DEFAULT_APPRECIATION_RATE = 0.03
 
@@ -69,6 +70,30 @@ function reducer(state: HouseState, action: HouseAction): HouseState {
   }
 }
 
-export default function usePropertyHouseEvent(intialEvent?: EventEntries) {
-  return useReducer(reducer, undefined, () => initialState(getHouseFromEvent(intialEvent)))
+export default function usePropertyHouseEvent(
+  userId: string,
+  scenario: string,
+  intialEvent?: EventEntries,
+) {
+  const [state, dispatch] = useReducer(reducer, undefined, () =>
+    initialState(getHouseFromEvent(intialEvent)),
+  )
+  const houseEntryInput: HouseEntryInput = {
+    userId,
+    scenario,
+    name: state.name,
+    startYear: Number(state.startYear),
+    endYear: Number(state.endYear),
+    existing: state.currentHome,
+    houseValue: Number(state.houseValue),
+    annualAppreciationRate: roundToDec(Number(state.appreciationRate) / 100, 4),
+    annualExpenses: Number(state.annualExpenses),
+    annualExpensesRate: roundToDec(Number(state.annualExpensesRate) / 100, 4),
+    mortgageAmount: state.currentHome
+      ? Number(state.mortgageAmount)
+      : Number(state.houseValue) - Number(state.downPayment),
+    mortgageYears: Number(state.mortgageYears),
+    mortgageRate: Number(state.mortgageRate),
+  }
+  return [state, dispatch, houseEntryInput] as const
 }
