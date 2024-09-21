@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { Divider } from '@/components/ui/divider'
+import { Switch } from './ui/switch'
 import { createOneTimeEntries, updateOneTimeEntries } from '@/lib/entries/income/oneTime/oneTime'
 import useIncomeOneTimeEvent from '@/lib/entries/income/oneTime/useIncomeOneTimeEvent'
 import {
@@ -9,7 +10,6 @@ import {
   useDeleteEventEntries,
   useUpdateEventEntries,
 } from '@/lib/entries/useEntries'
-import { Switch } from './ui/switch'
 import { EventEntries } from '@/services/entries.client'
 
 export interface IncomeOneTimeEventProps {

@@ -41,7 +41,7 @@ function buildOneTimeEntries(
     user_id: userId,
     scenario,
     name,
-    type: 'income',
+    type: 'expense',
     sub_type: 'one_time',
     start_year: year,
     end_year: year,

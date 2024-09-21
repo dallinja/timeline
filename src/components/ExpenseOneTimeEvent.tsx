@@ -1,43 +1,43 @@
-import { Entry } from '@/lib/types'
-import { useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Text } from './ui/text'
 import { Divider } from './ui/divider'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
-import {
-  createOneTimeEntries,
-  getOneTimeFromEntry,
-  updateOneTimeEntries,
-} from '@/lib/entries/expense/oneTime'
 import { Switch } from './ui/switch'
+import { createOneTimeEntries, updateOneTimeEntries } from '@/lib/entries/expense/oneTime/oneTime'
+import useExpenseOneTimeEvent from '@/lib/entries/expense/oneTime/useExpenseOneTimeEvent'
+import {
+  useCreateEventEntries,
+  useDeleteEventEntries,
+  useUpdateEventEntries,
+} from '@/lib/entries/useEntries'
+import { EventEntries } from '@/services/entries.client'
 
 export interface ExpenseOneTimeEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function ExpenseOneTimeEvent({ selectedEvent, onClose }: ExpenseOneTimeEventProps) {
-  const oneTime = getOneTimeFromEntry(selectedEvent)
-  const [name, setName] = useState(oneTime?.name ?? '')
-  const [year, setYear] = useState(oneTime?.year ?? '')
-  const [amount, setAmount] = useState(oneTime?.amount ?? '')
-  const [includeTaxes, setIncludeTaxes] = useState(oneTime?.taxable ?? false)
+export default function ExpenseOneTimeEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: ExpenseOneTimeEventProps) {
+  const [state, dispatch, oneTimeEntryInput] = useExpenseOneTimeEvent(
+    userId,
+    scenario,
+    selectedEvent,
+  )
 
-  const { mutate: createEntry } = useCreateEntries()
-  const { mutate: updateEntries } = useUpdateEntries()
-  const { mutate: deleteEntries } = useDeleteEntries()
+  const { mutate: createOneTimeEvent } = useCreateEventEntries(createOneTimeEntries)
+  const { mutate: updateOneTimeEvent } = useUpdateEventEntries(updateOneTimeEntries)
+  const { mutate: deleteOneTimeEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
-    if (!year) return
-    const entries = createOneTimeEntries({
-      scenario: 'default',
-      name,
-      year: Number(year),
-      amount: Number(amount),
-      taxable: includeTaxes,
-    })
-    createEntry(entries, {
+    if (!state.year) return
+    createOneTimeEvent(oneTimeEntryInput, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -45,27 +45,20 @@ export default function ExpenseOneTimeEvent({ selectedEvent, onClose }: ExpenseO
   }
 
   const handleUpdate = () => {
-    if (!year || !selectedEvent) return
-    const entries = updateOneTimeEntries(
+    if (!state.year || !selectedEvent) return
+    updateOneTimeEvent(
+      { input: oneTimeEntryInput, selectedEvent },
       {
-        scenario: 'default',
-        name,
-        year: Number(year),
-        amount: Number(amount),
-        taxable: includeTaxes,
+        onSuccess: () => {
+          onClose && onClose()
+        },
       },
-      selectedEvent,
     )
-    updateEntries(entries, {
-      onSuccess: () => {
-        onClose && onClose()
-      },
-    })
   }
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteEntries([{ id: selectedEvent.id }], {
+    deleteOneTimeEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -77,8 +70,8 @@ export default function ExpenseOneTimeEvent({ selectedEvent, onClose }: ExpenseO
       <Input
         className="mb-2"
         label="Expense name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={state.name}
+        onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text className="mt-6" bold>
         One-time amount
@@ -88,19 +81,24 @@ export default function ExpenseOneTimeEvent({ selectedEvent, onClose }: ExpenseO
         <Input
           className="mb-2"
           label="Year"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
+          value={state.year}
+          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
         />
         <Input
           className="mb-2"
           label="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={state.amount}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'amount', value: e.target.value })
+          }
         />
       </div>
       <Text fontSize="sm" className="flex items-center justify-between font-semibold">
-        Is this tax deductable?
-        <Switch checked={includeTaxes} onCheckedChange={setIncludeTaxes} />
+        Is this taxable?
+        <Switch
+          checked={state.taxable}
+          onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
+        />
       </Text>
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (
