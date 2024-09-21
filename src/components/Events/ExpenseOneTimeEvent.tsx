@@ -80,12 +80,20 @@ export default function ExpenseOneTimeEvent({
       <div className="flex gap-4">
         <Input
           className="mb-2"
+          fullWidth
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           label="Year"
           value={state.year}
           onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
         />
         <Input
           className="mb-2"
+          fullWidth
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           label="Amount"
           value={state.amount}
           onChange={(e) =>

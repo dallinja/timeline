@@ -1,10 +1,15 @@
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { Text } from '../ui/text'
-import { Divider } from '../ui/divider'
-import { Switch } from '../ui/switch'
-import { createYearlyEntries, updateYearlyEntries } from '@/lib/entries/expense/yearly/yearly'
-import useExpenseYearlyEvent from '@/lib/entries/expense/yearly/useExpenseYearlyEvent'
+'use client'
+
+import { Button } from '@/components/ui/button'
+import { Divider } from '@/components/ui/divider'
+import { Switch } from '@/components/ui/switch'
+import { Text } from '@/components/ui/text'
+import { Input } from '@/components/ui/input'
+import {
+  createInvestmentEntries,
+  updateInvestmentEntries,
+} from '@/lib/entries/investment/investment'
+import useInvestmentEvent from '@/lib/entries/investment/useInvestmentEvent'
 import {
   useCreateEventEntries,
   useDeleteEventEntries,
@@ -12,28 +17,35 @@ import {
 } from '@/lib/entries/useEntries'
 import { EventEntries } from '@/services/entries.client'
 
-export interface ExpenseYearlyEventProps {
+export interface InvestmentInvestmentEventProps {
   userId: string
   scenario: string
   selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function ExpenseYearlyEvent({
+export default function InvestmentInvestmentEvent({
   userId,
   scenario,
   selectedEvent,
   onClose,
-}: ExpenseYearlyEventProps) {
-  const [state, dispatch, yearlyEventInput] = useExpenseYearlyEvent(userId, scenario, selectedEvent)
+}: InvestmentInvestmentEventProps) {
+  const [state, dispatch, investmentEventInput] = useInvestmentEvent(
+    userId,
+    scenario,
+    selectedEvent,
+  )
 
-  const { mutate: createYearlyEvent } = useCreateEventEntries(createYearlyEntries)
-  const { mutate: updateYearlyEvent } = useUpdateEventEntries(updateYearlyEntries)
-  const { mutate: deleteYearlyEvent } = useDeleteEventEntries()
+  const { mutate: createInvestmentEvent } = useCreateEventEntries(createInvestmentEntries)
+  const { mutate: updateInvestmentEvent } = useUpdateEventEntries(updateInvestmentEntries)
+  const { mutate: deleteInvestmentEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
     if (!state.startYear || !state.endYear) return
-    createYearlyEvent(yearlyEventInput, {
+    createInvestmentEvent(investmentEventInput, {
+      onError: (err) => {
+        console.log('err: ', err)
+      },
       onSuccess: () => {
         onClose && onClose()
       },
@@ -42,8 +54,8 @@ export default function ExpenseYearlyEvent({
 
   const handleUpdate = () => {
     if (!state.startYear || !state.endYear || !selectedEvent) return
-    updateYearlyEvent(
-      { input: yearlyEventInput, selectedEvent },
+    updateInvestmentEvent(
+      { input: investmentEventInput, selectedEvent },
       {
         onSuccess: () => {
           onClose && onClose()
@@ -54,7 +66,7 @@ export default function ExpenseYearlyEvent({
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteYearlyEvent(selectedEvent, {
+    deleteInvestmentEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -65,19 +77,19 @@ export default function ExpenseYearlyEvent({
     <>
       <Input
         className="mb-2"
-        label="Expense name"
+        label="Investment name"
         value={state.name}
         onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text className="mt-6" bold>
-        Yearly expenses
+        Investment details
       </Text>
       <Divider className="mb-2" />
       <div className="mb-2 flex gap-5">
         <Input
           className="mb-2"
-          label="Start year"
           fullWidth
+          label="Start year"
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -89,31 +101,41 @@ export default function ExpenseYearlyEvent({
         <Input
           className="mb-2"
           label="End year"
-          fullWidth
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
+          fullWidth
           value={state.endYear}
           onChange={(e) =>
             dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
           }
         />
       </div>
-      <Input
-        className="mb-2"
-        label="Amount"
-        value={state.annualAmount}
-        onChange={(e) =>
-          dispatch({ type: 'UPDATE_FIELD', field: 'annualAmount', value: e.target.value })
-        }
-      />
+      <div className="mb-2 flex gap-5">
+        <Input
+          className="mb-2"
+          fullWidth
+          label="Starting annual amount"
+          value={state.annualAmount}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'annualAmount', value: e.target.value })
+          }
+        />
+        <Input
+          className="mb-2"
+          fullWidth
+          label="Annual return rate (%)"
+          value={state.annualReturnRate}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'annualReturnRate', value: e.target.value })
+          }
+        />
+      </div>
       <Text fontSize="sm" className="flex items-center justify-between font-semibold">
-        Is this tax deductable?
+        Is this taxable?
         <Switch
           checked={state.taxable}
-          onCheckedChange={(value) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value: value })
-          }
+          onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
         />
       </Text>
       <div className="flex justify-end gap-4 py-4">

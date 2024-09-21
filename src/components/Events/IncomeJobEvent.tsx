@@ -82,6 +82,7 @@ export default function IncomeJobEvent({
         <Input
           className="mb-2"
           label="Start year"
+          fullWidth
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -93,6 +94,10 @@ export default function IncomeJobEvent({
         <Input
           className="mb-2"
           label="End year"
+          fullWidth
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={state.endYear}
           onChange={(e) =>
             dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })

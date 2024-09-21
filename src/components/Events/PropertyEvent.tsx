@@ -1,12 +1,12 @@
-import { Entry } from '@/services/entries.server'
 import { SelectField, SelectItem } from '../ui/select'
+import { EventEntries } from '@/services/entries.client'
 import { useState } from 'react'
 import PropertyHouseEvent from './PropertyHouseEvent'
 
 export interface PropertyEventProps {
   userId: string
   scenario: string
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 

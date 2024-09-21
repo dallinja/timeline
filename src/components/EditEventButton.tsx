@@ -5,14 +5,15 @@ import IncomeEvent from './Events/IncomeEvent'
 import { useState } from 'react'
 import ExpenseEvent from './Events/ExpenseEvent'
 import PropertyEvent from './Events/PropertyEvent'
-import { Entry, EntryType } from '@/services/entries.server'
+import { Entry, EntryType, EventEntries } from '@/services/entries.server'
+import InvestmentEvent from './Events/InvestmentEvent'
 
 export interface EditEventButtonProps {
   userId: string
   scenario: string
   children: React.ReactNode
   eventType?: EntryType
-  event?: Entry & { relatedEntries?: Entry[] }
+  event?: EventEntries
 }
 
 export default function EditEventButton({
@@ -78,6 +79,15 @@ function EditEventDialogContent({
       case 'property':
         return (
           <PropertyEvent
+            userId={userId}
+            scenario={scenario}
+            selectedEvent={event}
+            onClose={onClose}
+          />
+        )
+      case 'investment':
+        return (
+          <InvestmentEvent
             userId={userId}
             scenario={scenario}
             selectedEvent={event}

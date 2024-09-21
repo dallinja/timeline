@@ -4,14 +4,14 @@ import { cn } from '@/lib/cn'
 import { Button, buttonBaseClass } from './ui/button'
 import EditEventButton from './EditEventButton'
 import PlusCircleIcon from './icons/PlusCircleIcon'
-import { Entry, EntryType } from '@/services/entries.server'
+import { Entry, EntryType, EventEntries } from '@/services/entries.server'
 
 export interface EventTypeSummaryProps {
   userId: string
   scenario: string
   eventType?: EntryType
   title?: React.ReactNode
-  events?: (Entry & { relatedEntries?: Entry[] })[]
+  events?: EventEntries[]
   maxYear?: number
 }
 
