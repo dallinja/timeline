@@ -27,7 +27,7 @@ export default function IncomeJobEvent({
   selectedEvent,
   onClose,
 }: IncomeJobEventProps) {
-  const [state, dispatch, jobEntryInput] = useIncomeJobEvent(userId, scenario, selectedEvent)
+  const [state, dispatch, jobEventInput] = useIncomeJobEvent(userId, scenario, selectedEvent)
 
   const { mutate: createJobEvent } = useCreateEventEntries(createJobEntries)
   const { mutate: updateJobEvent } = useUpdateEventEntries(updateJobEntries)
@@ -35,7 +35,7 @@ export default function IncomeJobEvent({
 
   const handleSave = () => {
     if (!state.startYear || !state.endYear) return
-    createJobEvent(jobEntryInput, {
+    createJobEvent(jobEventInput, {
       onError: (err) => {
         console.log('err: ', err)
       },
@@ -48,7 +48,7 @@ export default function IncomeJobEvent({
   const handleUpdate = () => {
     if (!state.startYear || !state.endYear || !selectedEvent) return
     updateJobEvent(
-      { input: jobEntryInput, selectedEvent },
+      { input: jobEventInput, selectedEvent },
       {
         onSuccess: () => {
           onClose && onClose()

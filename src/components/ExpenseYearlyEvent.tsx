@@ -1,45 +1,39 @@
-import { Entry } from '@/lib/types'
-import { useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Text } from './ui/text'
 import { Divider } from './ui/divider'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
-import {
-  createYearlyEntries,
-  getYearlyFromEntry,
-  updateYearlyEntries,
-} from '@/lib/entries/expense/yearly'
 import { Switch } from './ui/switch'
+import { createYearlyEntries, updateYearlyEntries } from '@/lib/entries/expense/yearly/yearly'
+import useExpenseYearlyEvent from '@/lib/entries/expense/yearly/useExpenseYearlyEvent'
+import {
+  useCreateEventEntries,
+  useDeleteEventEntries,
+  useUpdateEventEntries,
+} from '@/lib/entries/useEntries'
+import { EventEntries } from '@/services/entries.client'
 
 export interface ExpenseYearlyEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function ExpenseYearlyEvent({ selectedEvent, onClose }: ExpenseYearlyEventProps) {
-  const yearly = getYearlyFromEntry(selectedEvent)
-  const [name, setName] = useState(yearly?.name ?? '')
-  const [startYear, setStartYear] = useState(yearly?.startYear ?? '')
-  const [endYear, setEndYear] = useState(yearly?.endYear ?? '')
-  const [amount, setAmount] = useState(yearly?.amount ?? '')
-  const [includeTaxes, setIncludeTaxes] = useState(yearly?.taxable ?? false)
+export default function ExpenseYearlyEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: ExpenseYearlyEventProps) {
+  const [state, dispatch, yearlyEventInput] = useExpenseYearlyEvent(userId, scenario, selectedEvent)
 
-  const { mutate: createEntry } = useCreateEntries()
-  const { mutate: updateEntries } = useUpdateEntries()
-  const { mutate: deleteEntries } = useDeleteEntries()
+  const { mutate: createYearlyEvent } = useCreateEventEntries(createYearlyEntries)
+  const { mutate: updateYearlyEvent } = useUpdateEventEntries(updateYearlyEntries)
+  const { mutate: deleteYearlyEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
-    if (!startYear || !endYear) return
-    const entries = createYearlyEntries({
-      scenario: 'default',
-      name,
-      startYear: Number(startYear),
-      endYear: Number(endYear),
-      amount: Number(amount),
-      taxable: includeTaxes,
-    })
-    createEntry(entries, {
+    if (!state.startYear || !state.endYear) return
+    createYearlyEvent(yearlyEventInput, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -47,28 +41,20 @@ export default function ExpenseYearlyEvent({ selectedEvent, onClose }: ExpenseYe
   }
 
   const handleUpdate = () => {
-    if (!startYear || !endYear || !selectedEvent) return
-    const entries = updateYearlyEntries(
+    if (!state.startYear || !state.endYear || !selectedEvent) return
+    updateYearlyEvent(
+      { input: yearlyEventInput, selectedEvent },
       {
-        scenario: 'default',
-        name,
-        startYear: Number(startYear),
-        endYear: Number(endYear),
-        amount: Number(amount),
-        taxable: includeTaxes,
+        onSuccess: () => {
+          onClose && onClose()
+        },
       },
-      selectedEvent,
     )
-    updateEntries(entries, {
-      onSuccess: () => {
-        onClose && onClose()
-      },
-    })
   }
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteEntries([{ id: selectedEvent.id }], {
+    deleteYearlyEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -80,8 +66,8 @@ export default function ExpenseYearlyEvent({ selectedEvent, onClose }: ExpenseYe
       <Input
         className="mb-2"
         label="Expense name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={state.name}
+        onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text className="mt-6" bold>
         Yearly expenses
@@ -94,25 +80,36 @@ export default function ExpenseYearlyEvent({ selectedEvent, onClose }: ExpenseYe
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          value={startYear}
-          onChange={(e) => setStartYear(e.target.value)}
+          value={state.startYear}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value: e.target.value })
+          }
         />
         <Input
           className="mb-2"
           label="End year"
-          value={endYear}
-          onChange={(e) => setEndYear(e.target.value)}
+          value={state.endYear}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
+          }
         />
       </div>
       <Input
         className="mb-2"
         label="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+        value={state.annualAmount}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'annualAmount', value: e.target.value })
+        }
       />
       <Text fontSize="sm" className="flex items-center justify-between font-semibold">
         Is this tax deductable?
-        <Switch checked={includeTaxes} onCheckedChange={setIncludeTaxes} />
+        <Switch
+          checked={state.taxable}
+          onCheckedChange={(value) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value: value })
+          }
+        />
       </Text>
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (

@@ -1,16 +1,23 @@
-import { Entry } from '@/lib/types'
 import { SheetHeader } from './ui/sheet'
 import { SelectField, SelectItem } from './ui/select'
 import { useState } from 'react'
 import ExpenseOneTimeEvent from './ExpenseOneTimeEvent'
 import ExpenseYearlyEvent from './ExpenseYearlyEvent'
+import { EventEntries } from '@/services/entries.client'
 
 export interface ExpenseEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function ExpenseEvent({ selectedEvent, onClose }: ExpenseEventProps) {
+export default function ExpenseEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: ExpenseEventProps) {
   const [expenseType, setExpenseType] = useState(selectedEvent?.sub_type ?? '')
   return (
     <>
@@ -28,10 +35,20 @@ export default function ExpenseEvent({ selectedEvent, onClose }: ExpenseEventPro
         <SelectItem value="one_time">One-time amount</SelectItem>
       </SelectField>
       {expenseType === 'yearly' && (
-        <ExpenseYearlyEvent selectedEvent={selectedEvent} onClose={onClose} />
+        <ExpenseYearlyEvent
+          userId={userId}
+          scenario={scenario}
+          selectedEvent={selectedEvent}
+          onClose={onClose}
+        />
       )}
       {expenseType === 'one_time' && (
-        <ExpenseOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
+        <ExpenseOneTimeEvent
+          userId={userId}
+          scenario={scenario}
+          selectedEvent={selectedEvent}
+          onClose={onClose}
+        />
       )}
     </>
   )
