@@ -1,10 +1,10 @@
 'use client'
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet'
-import IncomeEvent from './IncomeEvent'
+import IncomeEvent from './Events/IncomeEvent'
 import { useState } from 'react'
-import ExpenseEvent from './ExpenseEvent'
-import PropertyEvent from './PropertyEvent'
+import ExpenseEvent from './Events/ExpenseEvent'
+import PropertyEvent from './Events/PropertyEvent'
 import { Entry, EntryType } from '@/services/entries.server'
 
 export interface EditEventButtonProps {

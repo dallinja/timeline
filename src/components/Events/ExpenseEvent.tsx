@@ -1,5 +1,5 @@
-import { SheetHeader } from './ui/sheet'
-import { SelectField, SelectItem } from './ui/select'
+import { SheetHeader } from '../ui/sheet'
+import { SelectField, SelectItem } from '../ui/select'
 import { useState } from 'react'
 import ExpenseOneTimeEvent from './ExpenseOneTimeEvent'
 import ExpenseYearlyEvent from './ExpenseYearlyEvent'

@@ -7,8 +7,7 @@ import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
 import { EventEntries } from '@/services/entries.client'
 import usePropertyHouseEvent from '@/lib/entries/property/usePropertyHouseEvent'
-import Collapse from './ui/collapse'
-import { revalidatePath } from 'next/cache'
+import Collapse from '../ui/collapse'
 import {
   useCreateEventEntries,
   useUpdateEventEntries,
@@ -40,7 +39,6 @@ export default function PropertyHouseEvent({
     createHouseEvent(houseEntryInput, {
       onSuccess: () => {
         onClose && onClose()
-        // revalidatePath('/timeline')
       },
     })
   }
@@ -52,7 +50,6 @@ export default function PropertyHouseEvent({
       {
         onSuccess: () => {
           onClose && onClose()
-          // revalidatePath('/(main)/timeline', 'page')
         },
       },
     )
@@ -63,7 +60,6 @@ export default function PropertyHouseEvent({
     deleteHouseEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
-        // revalidatePath('/timeline')
       },
     })
   }

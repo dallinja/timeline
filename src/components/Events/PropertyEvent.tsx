@@ -1,6 +1,5 @@
 import { Entry } from '@/services/entries.server'
-import { SheetHeader, SheetTitle } from './ui/sheet'
-import { SelectField, SelectItem } from './ui/select'
+import { SelectField, SelectItem } from '../ui/select'
 import { useState } from 'react'
 import PropertyHouseEvent from './PropertyHouseEvent'
 

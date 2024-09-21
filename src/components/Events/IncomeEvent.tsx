@@ -1,4 +1,4 @@
-import { SelectField, SelectItem } from './ui/select'
+import { SelectField, SelectItem } from '../ui/select'
 import { useState } from 'react'
 import IncomeJobEvent from './IncomeJobEvent'
 import IncomeOneTimeEvent from './IncomeOneTimeEvent'

@@ -1,8 +1,8 @@
-import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { Text } from './ui/text'
-import { Divider } from './ui/divider'
-import { Switch } from './ui/switch'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { Text } from '../ui/text'
+import { Divider } from '../ui/divider'
+import { Switch } from '../ui/switch'
 import { createYearlyEntries, updateYearlyEntries } from '@/lib/entries/expense/yearly/yearly'
 import useExpenseYearlyEvent from '@/lib/entries/expense/yearly/useExpenseYearlyEvent'
 import {

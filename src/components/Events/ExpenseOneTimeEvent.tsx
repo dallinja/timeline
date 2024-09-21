@@ -1,8 +1,8 @@
-import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { Text } from './ui/text'
-import { Divider } from './ui/divider'
-import { Switch } from './ui/switch'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { Text } from '../ui/text'
+import { Divider } from '../ui/divider'
+import { Switch } from '../ui/switch'
 import { createOneTimeEntries, updateOneTimeEntries } from '@/lib/entries/expense/oneTime/oneTime'
 import useExpenseOneTimeEvent from '@/lib/entries/expense/oneTime/useExpenseOneTimeEvent'
 import {
