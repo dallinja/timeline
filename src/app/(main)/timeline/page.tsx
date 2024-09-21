@@ -4,6 +4,7 @@ import { getEntries, getEntriesAndSubEntries } from '@/services/entries.server'
 import Events from './Events'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Breakdown from '@/components/Breakdown/Breakdown'
+// import InitialDataDialog from '@/components/InitialDataDialog'
 
 export default async function Timeline({
   searchParams,
@@ -18,7 +19,7 @@ export default async function Timeline({
   const entries = await getEntries({ userId, scenario })
   const entriesAndSubEntries = await getEntriesAndSubEntries({ userId, scenario: scenario })
 
-  // if (!entries) return <InitialDataDialog />
+  // if (!entries) return <InitialDataDialog scenario={scenario} />
 
   return (
     <>

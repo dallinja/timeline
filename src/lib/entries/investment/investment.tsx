@@ -58,8 +58,8 @@ function buildInvestmentEntries(
     sub_type: 'investment',
     start_year: startYear,
     end_year: endYear,
-    ...(annualAmount ? { cash_recurring: annualAmount } : {}),
-    ...(annualReturnRate ? { cash_recurring_rate: annualReturnRate } : {}),
+    ...(annualAmount ? { investments_recurring: annualAmount } : {}),
+    ...(annualReturnRate ? { investments_rate: annualReturnRate } : {}),
     ...(taxable ? { cash_taxable: true } : {}),
   }
   const relatedEntries: (CreateEntryInput | UpsertEntryInput)[] = []
@@ -76,8 +76,8 @@ export function getInvestmentFromEvent(event?: EventEntries): InvestmentEventInp
     name: event.name ?? '',
     startYear: event.start_year ?? 0,
     endYear: event.end_year ?? 0,
-    annualAmount: event.cash_recurring ?? 0,
+    annualAmount: event.investments_recurring ?? 0,
     taxable: event.cash_taxable ?? false,
-    annualReturnRate: event.cash_recurring_rate ?? 0,
+    annualReturnRate: event.investments_rate ?? 0,
   }
 }

@@ -19,10 +19,10 @@ import { getEntries } from '@/services/local'
 import { useCreateEntries, useDeleteEntries } from '@/queries/localEntries'
 
 export interface InitialDataDialogProps {
-  children?: React.ReactNode
+  scenario: string
 }
 
-const InitialDataDialog = ({ children }: InitialDataDialogProps) => {
+const InitialDataDialog = ({ scenario }: InitialDataDialogProps) => {
   const [open, setOpen] = useState(false)
 
   const [haveMortgage, setHaveMortgage] = useState('yes')

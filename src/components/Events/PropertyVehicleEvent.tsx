@@ -6,37 +6,41 @@ import { Switch } from '@/components/ui/switch'
 import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
 import { EventEntries } from '@/services/entries.client'
-import usePropertyHouseEvent from '@/lib/entries/property/house/usePropertyHouseEvent'
+import usePropertyVehicleEvent from '@/lib/entries/property/vehicle/usePropertyVehicleEvent'
 import Collapse from '../ui/collapse'
 import {
   useCreateEventEntries,
   useUpdateEventEntries,
   useDeleteEventEntries,
 } from '@/lib/entries/useEntries'
-import { createHouseEntries, updateHouseEntries } from '@/lib/entries/property/house/house'
+import { createVehicleEntries, updateVehicleEntries } from '@/lib/entries/property/vehicle/vehicle'
 
-export interface PropertyHouseEventProps {
+export interface PropertyVehicleEventProps {
   userId: string
   scenario: string
   selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function PropertyHouseEvent({
+export default function PropertyVehicleEvent({
   userId,
   scenario,
   selectedEvent,
   onClose,
-}: PropertyHouseEventProps) {
-  const [state, dispatch, houseEntryInput] = usePropertyHouseEvent(userId, scenario, selectedEvent)
+}: PropertyVehicleEventProps) {
+  const [state, dispatch, vehicleEntryInput] = usePropertyVehicleEvent(
+    userId,
+    scenario,
+    selectedEvent,
+  )
 
-  const { mutate: createHouseEvent } = useCreateEventEntries(createHouseEntries)
-  const { mutate: updateHouseEvent } = useUpdateEventEntries(updateHouseEntries)
-  const { mutate: deleteHouseEvent } = useDeleteEventEntries()
+  const { mutate: createVehicleEvent } = useCreateEventEntries(createVehicleEntries)
+  const { mutate: updateVehicleEvent } = useUpdateEventEntries(updateVehicleEntries)
+  const { mutate: deleteVehicleEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
     if (!state.startYear || !state.endYear) return
-    createHouseEvent(houseEntryInput, {
+    createVehicleEvent(vehicleEntryInput, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -45,8 +49,8 @@ export default function PropertyHouseEvent({
 
   const handleUpdate = () => {
     if (!state.startYear || !state.endYear || !selectedEvent) return
-    updateHouseEvent(
-      { input: houseEntryInput, selectedEvent },
+    updateVehicleEvent(
+      { input: vehicleEntryInput, selectedEvent },
       {
         onSuccess: () => {
           onClose && onClose()
@@ -57,7 +61,7 @@ export default function PropertyHouseEvent({
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteHouseEvent(selectedEvent, {
+    deleteVehicleEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -68,13 +72,13 @@ export default function PropertyHouseEvent({
     <>
       <Input
         className="mb-2"
-        label="House name"
+        label="Vehicle name"
         fullWidth
         value={state.name}
         onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text fontSize="sm" className="mt-4 flex items-center justify-between font-semibold">
-        Do you currently own this house?
+        Do you currently own this vehicle?
         <Switch
           checked={state.currentHome}
           onCheckedChange={(value) =>
@@ -83,16 +87,16 @@ export default function PropertyHouseEvent({
         />
       </Text>
       <Text className="mt-6" bold>
-        House details
+        Vehicle details
       </Text>
       <Divider className="mb-2" />
       <Input
         className="mb-2"
         label={state.currentHome ? 'Current home value' : 'Puchase amount'}
         fullWidth
-        value={state.houseValue}
+        value={state.vehicleValue}
         onChange={(e) =>
-          dispatch({ type: 'UPDATE_FIELD', field: 'houseValue', value: e.target.value })
+          dispatch({ type: 'UPDATE_FIELD', field: 'vehicleValue', value: e.target.value })
         }
       />
       <div className="mb-2 flex gap-5">
@@ -121,28 +125,28 @@ export default function PropertyHouseEvent({
         />
       </div>
       <Text className="mt-6" bold>
-        Mortgage
+        Loan
       </Text>
       <Divider className="mb-2" />
       <Text fontSize="sm" className="mt-4 flex items-center justify-between font-semibold">
-        Using a mortgage?
+        Using a loan?
         <Switch
-          checked={state.includeMortgage}
+          checked={state.includeLoan}
           onCheckedChange={(value) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'includeMortgage', value })
+            dispatch({ type: 'UPDATE_FIELD', field: 'includeLoan', value })
           }
         />
       </Text>
-      <Collapse open={state.includeMortgage} padding={6}>
+      <Collapse open={state.includeLoan} padding={6}>
         <div className="mt-4">
           {state.currentHome ? (
             <Input
-              name="mortgageAmount"
+              name="loanAmount"
               label="Remaining amount"
               fullWidth
-              value={state.mortgageAmount}
+              value={state.loanAmount}
               onChange={(e) =>
-                dispatch({ type: 'UPDATE_FIELD', field: 'mortgageAmount', value: e.target.value })
+                dispatch({ type: 'UPDATE_FIELD', field: 'loanAmount', value: e.target.value })
               }
             />
           ) : (
@@ -159,21 +163,21 @@ export default function PropertyHouseEvent({
         </div>
         <div className="mt-4 grid grid-cols-2 gap-5">
           <Input
-            name="mortgageYears"
+            name="loanYears"
             label={state.currentHome ? 'Remaining years' : 'Num of years'}
             fullWidth
-            value={state.mortgageYears}
+            value={state.loanYears}
             onChange={(e) =>
-              dispatch({ type: 'UPDATE_FIELD', field: 'mortgageYears', value: e.target.value })
+              dispatch({ type: 'UPDATE_FIELD', field: 'loanYears', value: e.target.value })
             }
           />
           <Input
-            name="mortgageRate"
+            name="loanRate"
             label="Loan rate"
             fullWidth
-            value={state.mortgageRate}
+            value={state.loanRate}
             onChange={(e) =>
-              dispatch({ type: 'UPDATE_FIELD', field: 'mortgageRate', value: e.target.value })
+              dispatch({ type: 'UPDATE_FIELD', field: 'loanRate', value: e.target.value })
             }
           />
         </div>
@@ -184,11 +188,11 @@ export default function PropertyHouseEvent({
       <Divider className="mb-2" />
       <Input
         className="mb-2"
-        label="Annual appreciation rate (%)"
+        label="Annual depreciation rate (%)"
         fullWidth
-        value={state.appreciationRate}
+        value={state.depreciationRate}
         onChange={(e) =>
-          dispatch({ type: 'UPDATE_FIELD', field: 'appreciationRate', value: e.target.value })
+          dispatch({ type: 'UPDATE_FIELD', field: 'depreciationRate', value: e.target.value })
         }
       />
       <Input
