@@ -67,8 +67,14 @@ function EditEventDialogContent({
           />
         )
       case 'expense':
-        return null
-      // return <ExpenseEvent selectedEvent={event} onClose={onClose} />
+        return (
+          <ExpenseEvent
+            userId={userId}
+            scenario={scenario}
+            selectedEvent={event}
+            onClose={onClose}
+          />
+        )
       case 'property':
         return (
           <PropertyEvent
