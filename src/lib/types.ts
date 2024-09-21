@@ -1,6 +1,6 @@
 export type EntryType = 'income' | 'expense' | 'property' | 'loan' | 'investment'
-type IncomeType = 'job' | 'one-time'
-type ExpenseType = 'yearly' | 'one-time' | 'annual-donation'
+type IncomeType = 'job' | 'one_time'
+type ExpenseType = 'yearly' | 'one_time' | 'annual_donation'
 type PropertyType = 'house' | 'car' | 'other'
 export type SubType = IncomeType | ExpenseType | PropertyType
 
@@ -27,7 +27,7 @@ export const EntryFields: EntryField[] = [
   {
     key: 'sub_type',
     type: 'union',
-    options: ['job', 'one-time', 'yearly', 'annual-donation', 'house'],
+    options: ['job', 'one_time', 'yearly', 'annual_donation', 'house'],
   },
   { key: 'name', type: 'string' },
   { key: 'parent_id', type: 'number' },

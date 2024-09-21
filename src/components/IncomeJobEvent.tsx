@@ -5,16 +5,14 @@ import { Divider } from '@/components/ui/divider'
 import { Switch } from '@/components/ui/switch'
 import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
-import { createJobEntries, updateJobEntries } from '@/lib/entries/income/job'
-import useIncomeJobEvent from '@/lib/entries/income/useIncomeJobEvent'
+import { createJobEntries, updateJobEntries } from '@/lib/entries/income/job/job'
+import useIncomeJobEvent from '@/lib/entries/income/job/useIncomeJobEvent'
 import {
   useCreateEventEntries,
   useDeleteEventEntries,
   useUpdateEventEntries,
 } from '@/lib/entries/useEntries'
 import { EventEntries } from '@/services/entries.client'
-
-const DEFAULT_ANNUAL_RAISE_RATE = 0.03
 
 export interface IncomeJobEventProps {
   userId: string
@@ -49,7 +47,6 @@ export default function IncomeJobEvent({
 
   const handleUpdate = () => {
     if (!state.startYear || !state.endYear || !selectedEvent) return
-    const entries = updateJobEntries(jobEntryInput, selectedEvent)
     updateJobEvent(
       { input: jobEntryInput, selectedEvent },
       {

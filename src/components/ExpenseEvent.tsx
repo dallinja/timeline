@@ -25,12 +25,12 @@ export default function ExpenseEvent({ selectedEvent, onClose }: ExpenseEventPro
         onValueChange={setExpenseType}
       >
         <SelectItem value="yearly">Yearly</SelectItem>
-        <SelectItem value="one-time">One-time amount</SelectItem>
+        <SelectItem value="one_time">One-time amount</SelectItem>
       </SelectField>
       {expenseType === 'yearly' && (
         <ExpenseYearlyEvent selectedEvent={selectedEvent} onClose={onClose} />
       )}
-      {expenseType === 'one-time' && (
+      {expenseType === 'one_time' && (
         <ExpenseOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
       )}
     </>

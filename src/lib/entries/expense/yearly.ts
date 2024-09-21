@@ -66,7 +66,7 @@ const baseEntry: CreateEntryInput = {
   name: '',
   parent_id: null,
   type: 'expense',
-  sub_type: 'one-time',
+  sub_type: 'one_time',
   user_id: '1',
   scenario: 'default',
 

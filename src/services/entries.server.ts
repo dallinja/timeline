@@ -11,8 +11,8 @@ export type UpsertEntryInput = Database['public']['Tables']['entries']['Update']
 }
 export type DeleteEntriesInput = { ids: number[] }
 export type EntryType = 'income' | 'expense' | 'property' | 'investment' | 'loan'
-type IncomeType = 'job' | 'one-time'
-type ExpenseType = 'yearly' | 'one-time' | 'annual-donation'
+type IncomeType = 'job' | 'one_time'
+type ExpenseType = 'yearly' | 'one_time' | 'annual_donation'
 type PropertyType = 'house' | 'car' | 'other'
 export type SubType = IncomeType | ExpenseType | PropertyType
 

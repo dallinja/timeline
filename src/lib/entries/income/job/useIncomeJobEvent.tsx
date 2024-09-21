@@ -1,5 +1,5 @@
 import { useReducer } from 'react'
-import { getJobFromEvent, JobEntryInput } from './job'
+import { getJobFromEvent, JobEventInput } from './job'
 import { EventEntries } from '@/services/entries.client'
 import { roundToDec } from '@/lib/number'
 
@@ -25,7 +25,7 @@ type JobAction = {
 }
 
 // Define the initial state
-const initialState = (job?: JobEntryInput): JobState => ({
+const initialState = (job?: JobEventInput): JobState => ({
   // General
   name: job?.name ?? '',
   startYear: String(job?.startYear ?? ''),
@@ -60,7 +60,7 @@ export default function useIncomeJobEvent(
   const [state, dispatch] = useReducer(reducer, undefined, () =>
     initialState(getJobFromEvent(intialEvent)),
   )
-  const houseEntryInput: JobEntryInput = {
+  const houseEntryInput: JobEventInput = {
     userId,
     scenario,
     name: state.name,

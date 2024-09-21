@@ -30,7 +30,7 @@ export default function IncomeEvent({
         onValueChange={setIncomeType}
       >
         <SelectItem value="job">Job</SelectItem>
-        <SelectItem value="one-time">One-time amount</SelectItem>
+        <SelectItem value="one_time">One-time amount</SelectItem>
       </SelectField>
       {incomeType === 'job' && (
         <IncomeJobEvent
@@ -40,10 +40,14 @@ export default function IncomeEvent({
           onClose={onClose}
         />
       )}
-      {
-        incomeType === 'one-time' && null
-        // <IncomeOneTimeEvent selectedEvent={selectedEvent} onClose={onClose} />
-      }
+      {incomeType === 'one_time' && (
+        <IncomeOneTimeEvent
+          userId={userId}
+          scenario={scenario}
+          selectedEvent={selectedEvent}
+          onClose={onClose}
+        />
+      )}
     </>
   )
 }

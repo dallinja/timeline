@@ -1,6 +1,6 @@
 import { CreateEntryInput, EventEntries, UpsertEntryInput } from '@/services/entries.client'
 
-export type JobEntryInput = {
+export type JobEventInput = {
   userId: string
   scenario: string
   name: string
@@ -14,21 +14,21 @@ export type JobEntryInput = {
 }
 
 export function createJobEntries(
-  input: JobEntryInput,
+  input: JobEventInput,
 ): [CreateEntryInput, CreateEntryInput[], null] {
   return buildJobEntries(input)
 }
 
 export function updateJobEntries(
-  input: JobEntryInput,
+  input: JobEventInput,
   selectedEvent: EventEntries,
 ): [UpsertEntryInput, (CreateEntryInput | UpsertEntryInput)[], { ids: number[] } | null] {
   return buildJobEntries(input, selectedEvent)
 }
 
-function buildJobEntries(input: JobEntryInput): [CreateEntryInput, CreateEntryInput[], null]
+function buildJobEntries(input: JobEventInput): [CreateEntryInput, CreateEntryInput[], null]
 function buildJobEntries(
-  input: JobEntryInput,
+  input: JobEventInput,
   selectedEvent: EventEntries,
 ): [UpsertEntryInput, (CreateEntryInput | UpsertEntryInput)[], { ids: number[] } | null]
 
@@ -44,7 +44,7 @@ function buildJobEntries(
     taxable = false,
     startingBonus,
     annualDonationRate,
-  }: JobEntryInput,
+  }: JobEventInput,
   selectedEvent?: EventEntries,
 ): [
   CreateEntryInput | UpsertEntryInput,
@@ -67,7 +67,7 @@ function buildJobEntries(
   }
 
   const relatedDonation = selectedEvent?.relatedEntries?.find(
-    (ent) => ent.sub_type === 'annual-donation',
+    (ent) => ent.sub_type === 'annual_donation',
   )
   const relatedEntries: (CreateEntryInput | UpsertEntryInput)[] = []
 
@@ -78,7 +78,7 @@ function buildJobEntries(
       scenario,
       name: 'Annual donation',
       type: 'expense' as CreateEntryInput['type'],
-      sub_type: 'annual-donation' as CreateEntryInput['sub_type'],
+      sub_type: 'annual_donation' as CreateEntryInput['sub_type'],
       start_year: startYear,
       end_year: endYear,
       cash_recurring: -annualSalary * annualDonationRate,
@@ -94,9 +94,9 @@ function buildJobEntries(
   return [entry, relatedEntries, deletedEntries]
 }
 
-export function getJobFromEvent(event?: EventEntries): JobEntryInput | undefined {
+export function getJobFromEvent(event?: EventEntries): JobEventInput | undefined {
   if (!event) return undefined
-  const relatedDonation = event.relatedEntries?.find((ent) => ent.sub_type === 'annual-donation')
+  const relatedDonation = event.relatedEntries?.find((ent) => ent.sub_type === 'annual_donation')
   return {
     userId: event.user_id,
     scenario: event.scenario ?? '',

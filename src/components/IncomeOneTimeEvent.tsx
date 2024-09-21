@@ -1,45 +1,45 @@
 import { Entry } from '@/lib/types'
 import { useState } from 'react'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { Text } from './ui/text'
-import { Divider } from './ui/divider'
-import { useCreateEntries, useDeleteEntries, useUpdateEntries } from '@/queries/localEntries'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
+import { Divider } from '@/components/ui/divider'
+import { createOneTimeEntries, updateOneTimeEntries } from '@/lib/entries/income/oneTime/oneTime'
+import useIncomeOneTimeEvent from '@/lib/entries/income/oneTime/useIncomeOneTimeEvent'
 import {
-  createOneTimeEntries,
-  getOneTimeFromEntry,
-  updateOneTimeEntries,
-} from '@/lib/entries/income/oneTime'
+  useCreateEventEntries,
+  useDeleteEventEntries,
+  useUpdateEventEntries,
+} from '@/lib/entries/useEntries'
 import { Switch } from './ui/switch'
+import { EventEntries } from '@/services/entries.client'
 
 export interface IncomeOneTimeEventProps {
-  selectedEvent?: Entry & { relatedEntries?: Entry[] | null }
+  userId: string
+  scenario: string
+  selectedEvent?: EventEntries
   onClose?: () => void
 }
 
-export default function IncomeOneTimeEvent({ selectedEvent, onClose }: IncomeOneTimeEventProps) {
-  const oneTime = getOneTimeFromEntry(selectedEvent)
-  const [name, setName] = useState(oneTime?.name ?? '')
-  const [year, setYear] = useState(oneTime?.year ?? '')
-  const [amount, setAmount] = useState(oneTime?.amount ?? '')
-  const [includeTaxes, setIncludeTaxes] = useState(oneTime?.taxable ?? true)
-  const [donationRate, setDonationRate] = useState(oneTime?.donationRate ?? '')
+export default function IncomeOneTimeEvent({
+  userId,
+  scenario,
+  selectedEvent,
+  onClose,
+}: IncomeOneTimeEventProps) {
+  const [state, dispatch, oneTimeEntryInput] = useIncomeOneTimeEvent(
+    userId,
+    scenario,
+    selectedEvent,
+  )
 
-  const { mutate: createEntry } = useCreateEntries()
-  const { mutate: updateEntries } = useUpdateEntries()
-  const { mutate: deleteEntries } = useDeleteEntries()
+  const { mutate: createOneTimeEvent } = useCreateEventEntries(createOneTimeEntries)
+  const { mutate: updateOneTimeEvent } = useUpdateEventEntries(updateOneTimeEntries)
+  const { mutate: deleteOneTimeEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
-    if (!year) return
-    const entries = createOneTimeEntries({
-      scenario: 'default',
-      name,
-      year: Number(year),
-      amount: Number(amount),
-      taxable: includeTaxes,
-      donationRate: Number(donationRate),
-    })
-    createEntry(entries, {
+    if (!state.year) return
+    createOneTimeEvent(oneTimeEntryInput, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -47,28 +47,20 @@ export default function IncomeOneTimeEvent({ selectedEvent, onClose }: IncomeOne
   }
 
   const handleUpdate = () => {
-    if (!year || !selectedEvent) return
-    const entries = updateOneTimeEntries(
+    if (!state.year || !selectedEvent) return
+    updateOneTimeEvent(
+      { input: oneTimeEntryInput, selectedEvent },
       {
-        scenario: 'default',
-        name,
-        year: Number(year),
-        amount: Number(amount),
-        taxable: includeTaxes,
-        donationRate: Number(donationRate),
+        onSuccess: () => {
+          onClose && onClose()
+        },
       },
-      selectedEvent,
     )
-    updateEntries(entries, {
-      onSuccess: () => {
-        onClose && onClose()
-      },
-    })
   }
 
   const handleDelete = () => {
     if (!selectedEvent) return
-    deleteEntries([{ id: selectedEvent.id }], {
+    deleteOneTimeEvent(selectedEvent, {
       onSuccess: () => {
         onClose && onClose()
       },
@@ -80,8 +72,8 @@ export default function IncomeOneTimeEvent({ selectedEvent, onClose }: IncomeOne
       <Input
         className="mb-2"
         label="Income name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={state.name}
+        onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
       <Text className="mt-6" bold>
         One-time amount
@@ -91,27 +83,32 @@ export default function IncomeOneTimeEvent({ selectedEvent, onClose }: IncomeOne
         <Input
           className="mb-2"
           label="Year"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
+          value={state.year}
+          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
         />
         <Input
           className="mb-2"
           label="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={state.amount}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'amount', value: e.target.value })
+          }
         />
       </div>
       <Text fontSize="sm" className="flex items-center justify-between font-semibold">
         Is this taxable?
-        <Switch checked={includeTaxes} onCheckedChange={setIncludeTaxes} />
+        <Switch
+          checked={state.taxable}
+          onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
+        />
       </Text>
-      <Divider className="my-6" />
+      {/* <Divider className="my-6" />
       <Input
         className="mb-2"
         label="Donation percentage"
-        value={donationRate}
-        onChange={(e) => setDonationRate(e.target.value)}
-      />
+        value={state.donationRate}
+        onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'donationRate', value: e.target.value })}
+      /> */}
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (
           <Button variant="error" onClick={handleDelete}>

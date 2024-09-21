@@ -25,13 +25,13 @@ public.entries (
   loans_periods
 )
 values
-  ('Initial cash', 'income', 'one-time', '1', 'default', 2023, 2023, false, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+  ('Initial cash', 'income', 'one_time', '1', 'default', 2023, 2023, false, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
   ('Annual expenses', 'expense', 'yearly', '1', 'default', 2023, 2076, false, 0, 0, -80000, 0.02, 0, 0, 0, 0, 0, 0, 0, 0),
   ('Home', 'property', 'house', '1', 'default', 2023, 2076, false, 0, 0, -5000, 0.02, 500000, 0.025, 0, 0, 0, 0, 0, 0),
   ('Trad Existing Investment', 'investment', 'job', '1', 'default', 2023, 2049, false, 50000, 0, 0, 0, 0, 0, 50000, 0.08, 16000, 0.03, 0, 0, 0),
   ('Trad Investment Annuity', 'investment', 'job', '1', 'default', 2049, 2076, false, 0, 0, 0, 0, 0, 0, 2180679.388571163, 0.04, -133873.44914832202, 0.02, 0, 0, 0),
   ('User Testing', 'income', 'job', '1', 'default', 2023, 2028, false, 10000, 0, 150000, 0.03, 0, 0, 0, 0, 0, 0, 0, 0),
-  ('Car', 'expense', 'one-time', '1', 'default', 2025, 2025, false, -60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+  ('Car', 'expense', 'one_time', '1', 'default', 2025, 2025, false, -60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
   ('Job 2', 'income', 'job', '1', 'default', 2028, 2047, false, 0, 0, 300000, 0.03, 0, 0, 0, 0, 0, 0, 0, 0);
 
 insert into
@@ -61,7 +61,7 @@ public.entries (
 )
 values
   ('Mortgage', 1234, 'loan', 'house', '1', 'default', 2023, 2051, 50000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 450000, 0.03, 28),
-  ('Annual donation', 1700029529688125, 'expense', 'annual-donation', '1', 'default', 2023, 2028, 0, 0, -15000, 0.03, 0, 0, 0, 0, 0, 0, 0, 0);
+  ('Annual donation', 1700029529688125, 'expense', 'annual_donation', '1', 'default', 2023, 2028, 0, 0, -15000, 0.03, 0, 0, 0, 0, 0, 0, 0, 0);
 
 
 

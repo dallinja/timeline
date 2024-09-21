@@ -7,7 +7,7 @@ export function createTimeline(formData: FormData) {
   const entries: CreateEntryInput[] = [
     buildIncomeEntry({
       type: 'income',
-      subType: 'one-time',
+      subType: 'one_time',
       name: 'Initial cash',
       startYear: currentYear,
       endYear: currentYear,
