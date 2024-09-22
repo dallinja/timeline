@@ -116,6 +116,18 @@ export default function ExpenseYearlyEvent({
           }
         />
       </Text>
+      <Text className="mt-6" bold>
+        Other details
+      </Text>
+      <Divider className="mb-2" />
+      <Input
+        className="mb-2"
+        label="Annual increase rate (%)"
+        value={state.annualIncreaseRate}
+        onChange={(e) =>
+          dispatch({ type: 'UPDATE_FIELD', field: 'annualIncreaseRate', value: e.target.value })
+        }
+      />
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (
           <Button variant="error" onClick={handleDelete}>

@@ -6,6 +6,7 @@ export type InvestmentEventInput = {
   name: string
   startYear: number
   endYear: number
+  existing?: boolean
   annualAmount: number
   annualReturnRate?: number
   taxable?: boolean
@@ -39,6 +40,7 @@ function buildInvestmentEntries(
     name,
     startYear,
     endYear,
+    existing,
     annualAmount,
     annualReturnRate,
     taxable = false,
@@ -57,6 +59,7 @@ function buildInvestmentEntries(
     type: 'investment',
     sub_type: 'investment',
     start_year: startYear,
+    existing: existing ?? false,
     end_year: endYear,
     ...(annualAmount ? { investments_recurring: annualAmount } : {}),
     ...(annualReturnRate ? { investments_rate: annualReturnRate } : {}),
@@ -76,6 +79,7 @@ export function getInvestmentFromEvent(event?: EventEntries): InvestmentEventInp
     name: event.name ?? '',
     startYear: event.start_year ?? 0,
     endYear: event.end_year ?? 0,
+    existing: event.existing ?? false,
     annualAmount: event.investments_recurring ?? 0,
     taxable: event.cash_taxable ?? false,
     annualReturnRate: event.investments_rate ?? 0,

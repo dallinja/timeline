@@ -55,7 +55,7 @@ function buildYearlyEntries(
     sub_type: 'yearly',
     start_year: startYear,
     end_year: endYear,
-    ...(annualAmount ? { cash_recurring: annualAmount } : {}),
+    ...(annualAmount ? { cash_recurring: -annualAmount } : {}),
     ...(annualIncreaseRate ? { cash_recurring_rate: annualIncreaseRate } : {}),
     ...(taxable ? { cash_taxable: true } : {}),
   }
@@ -71,7 +71,7 @@ export function getYearlyFromEvent(event?: EventEntries): YearlyEventInput | und
     name: event.name ?? '',
     startYear: event.start_year ?? 0,
     endYear: event.end_year ?? 0,
-    annualAmount: event.cash_recurring ?? 0,
+    annualAmount: -(event.cash_recurring ?? 0),
     taxable: event.cash_taxable ?? false,
     annualIncreaseRate: event.cash_recurring_rate ?? 0,
   }

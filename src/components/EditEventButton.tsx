@@ -28,7 +28,7 @@ export default function EditEventButton({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent aria-describedby={undefined}>
+      <SheetContent className="sm:max-w-md" aria-describedby={undefined}>
         <EditEventDialogContent
           userId={userId}
           scenario={scenario}
@@ -51,7 +51,7 @@ function EditEventDialogContent({
   userId: string
   scenario: string
   eventType?: EntryType | null
-  event?: Entry & { relatedEntries?: Entry[] | null }
+  event?: EventEntries
   onClose?: () => void
 }) {
   const eventTypeTitle = eventType ? eventType.charAt(0).toUpperCase() + eventType.slice(1) : ''

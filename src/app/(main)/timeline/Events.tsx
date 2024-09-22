@@ -53,6 +53,7 @@ export default function Events({ entries, userId, scenario }: EventsProps) {
         <EventTypeSummary
           userId={userId}
           scenario={scenario}
+          eventType="investment"
           title="Investments"
           events={events.investment}
           maxYear={2086}

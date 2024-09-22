@@ -16,6 +16,7 @@ import {
   useUpdateEventEntries,
 } from '@/lib/entries/useEntries'
 import { EventEntries } from '@/services/entries.client'
+import { YearDropdown } from '@/components/YearDropdown'
 
 export interface InvestmentInvestmentEventProps {
   userId: string
@@ -86,29 +87,22 @@ export default function InvestmentInvestmentEvent({
       </Text>
       <Divider className="mb-2" />
       <div className="mb-2 flex gap-5">
-        <Input
+        <YearDropdown
           className="mb-2"
+          maxYear={2086}
+          start
           fullWidth
           label="Start year"
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
           value={state.startYear}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value: e.target.value })
-          }
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value })}
         />
-        <Input
+        <YearDropdown
+          maxYear={2086}
           className="mb-2"
           label="End year"
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
           fullWidth
           value={state.endYear}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
-          }
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value })}
         />
       </div>
       <div className="mb-2 flex gap-5">

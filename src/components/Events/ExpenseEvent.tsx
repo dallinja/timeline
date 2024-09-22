@@ -1,4 +1,3 @@
-import { SheetHeader } from '../ui/sheet'
 import { SelectField, SelectItem } from '../ui/select'
 import { useState } from 'react'
 import ExpenseOneTimeEvent from './ExpenseOneTimeEvent'
@@ -21,7 +20,6 @@ export default function ExpenseEvent({
   const [expenseType, setExpenseType] = useState(selectedEvent?.sub_type ?? '')
   return (
     <>
-      <SheetHeader>{selectedEvent ? 'Edit' : 'Add'} Expense</SheetHeader>
       <SelectField
         id="expense-type"
         className="mb-4"

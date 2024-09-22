@@ -1,10 +1,12 @@
 import { Entry, EntryType } from '@/services/entries.server'
 import { emptyYearData, YearData } from './types'
-import getYearDataCash from './getYearDataCash'
+import getYearDataCash from './getYearDataIncome'
 import getYearDataProperty from './getYearDataProperty'
 import getYearDataInvestments from './getYearDataInvestments'
 import getYearDataLoans from './getYearDataLoans'
 import { roundDataToDecimals } from '../number'
+import getYearDataIncome from './getYearDataIncome'
+import getYearDataExpenses from './getYearDataExpenses'
 
 const currentYear = new Date().getFullYear()
 
@@ -44,8 +46,10 @@ function getYearsDataPerYear(entries: Entry[], maxYear: number): Record<number, 
       const lastIndex = entryYears - 1
       let yearData: YearData = emptyYearData()
 
-      if (['income', 'expense'].includes(entry.type as EntryType)) {
-        yearData = getYearDataCash(entry, index, lastIndex)
+      if (entry.type === 'income') {
+        yearData = getYearDataIncome(entry, index, lastIndex)
+      } else if (entry.type === 'expense') {
+        yearData = getYearDataExpenses(entry, index, lastIndex)
       } else if (entry.type === 'property') {
         yearData = getYearDataProperty(entry, index, lastIndex)
       } else if (entry.type === 'investment') {

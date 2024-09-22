@@ -1,4 +1,4 @@
-import getYearDataCash from '@/lib/charts/getYearDataCash'
+import getYearDataCash from '@/lib/charts/getYearDataIncome'
 import { expect, test, describe } from 'vitest'
 import { blankEntry } from './blankEntry'
 

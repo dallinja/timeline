@@ -53,7 +53,7 @@ const SelectContent = React.forwardRef<
       >
         <SelectPrimitive.Viewport
           className={cn(
-            'p-1',
+            'max-h-60 overflow-auto p-1',
             position === 'popper' &&
               'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]',
           )}
@@ -119,7 +119,7 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName
  * CUSTOM
  */
 
-type SelectFieldProps = {
+export type SelectFieldProps = {
   children: React.ReactNode
   className?: string
   id: string
@@ -144,7 +144,7 @@ const SelectField = ({
 }: SelectFieldProps & SelectPrimitive.SelectProps) => {
   const Comp = label ? 'div' : React.Fragment
   return (
-    <Comp {...(label ? { className } : {})}>
+    <Comp {...(label ? { className: cn(fullWidth && 'w-full', className) } : {})}>
       {label && (
         <Text asChild className="font-semibold" fontSize="sm">
           <label htmlFor={id}>{label}</label>

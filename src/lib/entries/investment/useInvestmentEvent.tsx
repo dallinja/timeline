@@ -3,7 +3,8 @@ import { getInvestmentFromEvent, InvestmentEventInput } from './investment'
 import { EventEntries } from '@/services/entries.client'
 import { roundToDec } from '@/lib/number'
 
-const DEFAULT_APPRECIATION_RATE = 0.03
+const DEFAULT_RETURN_RATE = 0.1
+const currentYear = new Date().getFullYear()
 
 type InvestmentState = {
   // General
@@ -32,7 +33,7 @@ const initialState = (investment?: InvestmentEventInput): InvestmentState => ({
   annualAmount: String(investment?.annualAmount ?? ''),
   annualReturnRate: investment?.annualReturnRate
     ? String((investment.annualReturnRate ?? 0) * 100)
-    : String(DEFAULT_APPRECIATION_RATE * 100),
+    : String(DEFAULT_RETURN_RATE * 100),
   taxable: investment?.taxable ?? false,
 })
 
@@ -58,8 +59,9 @@ export default function useIncomeInvestmentEvent(
     userId,
     scenario,
     name: state.name,
-    startYear: Number(state.startYear),
+    startYear: state.startYear === 'existing' ? currentYear : Number(state.startYear),
     endYear: Number(state.endYear),
+    existing: state.startYear === 'existing',
     annualAmount: Number(state.annualAmount),
     annualReturnRate: roundToDec(Number(state.annualReturnRate) / 100, 4),
     taxable: state.taxable,

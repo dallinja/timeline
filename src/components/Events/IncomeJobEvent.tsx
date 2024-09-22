@@ -145,7 +145,7 @@ export default function IncomeJobEvent({
       <Divider className="mb-2" />
       <Input
         className="mb-2"
-        label="Annual donation percentage"
+        label="Annual donation percentage (%)"
         value={state.annualDonationRate}
         onChange={(e) =>
           dispatch({ type: 'UPDATE_FIELD', field: 'annualDonationRate', value: e.target.value })

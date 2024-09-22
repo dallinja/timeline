@@ -58,11 +58,18 @@ export default function EventTypeSummary({
 }
 
 function getAmount(event: Entry) {
-  if (event.type === 'income' || event.type === 'expense') {
+  if (event.type === 'income') {
     if (event.cash_recurring) {
       return formatCurrency(event.cash_recurring)
     } else if (event.cash_start) {
       return formatCurrency(event.cash_start)
+    }
+  }
+  if (event.type === 'expense') {
+    if (event.cash_recurring) {
+      return formatCurrency(-event.cash_recurring)
+    } else if (event.cash_start) {
+      return formatCurrency(-event.cash_start)
     }
   }
   if (event.type === 'property') {

@@ -37,9 +37,7 @@ const initialState = (job?: JobEventInput): JobState => ({
     : String(DEFAULT_APPRECIATION_RATE * 100),
   taxable: job?.taxable ?? false,
   startingBonus: String(job?.startingBonus ?? ''),
-  annualDonationRate: job?.annualDonationRate
-    ? String((job.annualDonationRate ?? 0) * 100)
-    : String(DEFAULT_APPRECIATION_RATE * 100),
+  annualDonationRate: job?.annualDonationRate ? String((job.annualDonationRate ?? 0) * 100) : '',
 })
 
 // Define the reducer function
