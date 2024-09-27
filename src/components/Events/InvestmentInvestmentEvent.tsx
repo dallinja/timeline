@@ -86,9 +86,9 @@ export default function InvestmentInvestmentEvent({
         Investment details
       </Text>
       <Divider className="mb-2" />
-      <div className="mb-2 flex gap-5">
+      <div className="mb-4 flex gap-5">
         <YearDropdown
-          className="mb-2"
+          birthYear={1986}
           maxYear={2086}
           start
           fullWidth
@@ -97,17 +97,16 @@ export default function InvestmentInvestmentEvent({
           onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value })}
         />
         <YearDropdown
+          birthYear={1986}
           maxYear={2086}
-          className="mb-2"
-          label="End year"
           fullWidth
+          label="End year"
           value={state.endYear}
           onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value })}
         />
       </div>
       <div className="mb-2 flex gap-5">
         <Input
-          className="mb-2"
           fullWidth
           label="Starting annual amount"
           value={state.annualAmount}
@@ -116,7 +115,6 @@ export default function InvestmentInvestmentEvent({
           }
         />
         <Input
-          className="mb-2"
           fullWidth
           label="Annual return rate (%)"
           value={state.annualReturnRate}

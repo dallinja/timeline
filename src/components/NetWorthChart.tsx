@@ -123,6 +123,7 @@ export default function NetWorthChart({ entries, maxYear }: { entries: Entry[]; 
               tickMargin={8}
               tickLine={false}
               axisLine={false}
+              width={100}
               tickFormatter={(value) => currencyFormatter.format(value)}
             />
             <ChartTooltip

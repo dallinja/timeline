@@ -14,6 +14,7 @@ import {
   useDeleteEventEntries,
 } from '@/lib/entries/useEntries'
 import { createHouseEntries, updateHouseEntries } from '@/lib/entries/property/house/house'
+import { YearDropdown } from '../YearDropdown'
 
 export interface PropertyHouseEventProps {
   userId: string
@@ -35,7 +36,7 @@ export default function PropertyHouseEvent({
   const { mutate: deleteHouseEvent } = useDeleteEventEntries()
 
   const handleSave = () => {
-    if (!state.startYear || !state.endYear) return
+    if (!state.startYear) return
     createHouseEvent(houseEntryInput, {
       onSuccess: () => {
         onClose && onClose()
@@ -44,7 +45,7 @@ export default function PropertyHouseEvent({
   }
 
   const handleUpdate = () => {
-    if (!state.startYear || !state.endYear || !selectedEvent) return
+    if (!state.startYear || !selectedEvent) return
     updateHouseEvent(
       { input: houseEntryInput, selectedEvent },
       {
@@ -64,6 +65,8 @@ export default function PropertyHouseEvent({
     })
   }
 
+  const existing = state.startYear === 'existing'
+
   return (
     <>
       <Input
@@ -73,53 +76,38 @@ export default function PropertyHouseEvent({
         value={state.name}
         onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'name', value: e.target.value })}
       />
-      <Text fontSize="sm" className="mt-4 flex items-center justify-between font-semibold">
-        Do you currently own this house?
-        <Switch
-          checked={state.currentHome}
-          onCheckedChange={(value) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'currentHome', value })
-          }
-        />
-      </Text>
       <Text className="mt-6" bold>
         House details
       </Text>
       <Divider className="mb-2" />
+      <div className="mb-2 flex gap-5">
+        <YearDropdown
+          birthYear={1986}
+          maxYear={2086}
+          start
+          fullWidth
+          label="Purchase year"
+          value={state.startYear}
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value })}
+        />
+        <YearDropdown
+          birthYear={1986}
+          maxYear={2086}
+          fullWidth
+          label="Planned sale year"
+          value={state.endYear}
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value })}
+        />
+      </div>
       <Input
         className="mb-2"
-        label={state.currentHome ? 'Current home value' : 'Puchase amount'}
+        label={existing ? 'Current home value' : 'Puchase amount'}
         fullWidth
         value={state.houseValue}
         onChange={(e) =>
           dispatch({ type: 'UPDATE_FIELD', field: 'houseValue', value: e.target.value })
         }
       />
-      <div className="mb-2 flex gap-5">
-        {!state.currentHome && (
-          <Input
-            className="mb-2"
-            label="Purchase year"
-            fullWidth
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={state.startYear}
-            onChange={(e) =>
-              dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value: e.target.value })
-            }
-          />
-        )}
-        <Input
-          className="mb-2"
-          label={`${state.currentHome ? 'Planned ' : ''}Sale year`}
-          fullWidth
-          value={state.endYear}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
-          }
-        />
-      </div>
       <Text className="mt-6" bold>
         Mortgage
       </Text>
@@ -135,7 +123,7 @@ export default function PropertyHouseEvent({
       </Text>
       <Collapse open={state.includeMortgage} padding={6}>
         <div className="mt-4">
-          {state.currentHome ? (
+          {existing ? (
             <Input
               name="mortgageAmount"
               label="Remaining amount"
@@ -160,7 +148,7 @@ export default function PropertyHouseEvent({
         <div className="mt-4 grid grid-cols-2 gap-5">
           <Input
             name="mortgageYears"
-            label={state.currentHome ? 'Remaining years' : 'Num of years'}
+            label={existing ? 'Remaining years' : 'Num of years'}
             fullWidth
             value={state.mortgageYears}
             onChange={(e) =>

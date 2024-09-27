@@ -13,6 +13,7 @@ import {
   useUpdateEventEntries,
 } from '@/lib/entries/useEntries'
 import { EventEntries } from '@/services/entries.client'
+import { YearDropdown } from '../YearDropdown'
 
 export interface IncomeJobEventProps {
   userId: string
@@ -78,30 +79,23 @@ export default function IncomeJobEvent({
         Job details
       </Text>
       <Divider className="mb-2" />
-      <div className="mb-2 flex gap-5">
-        <Input
-          className="mb-2"
+      <div className="mb-4 flex gap-5">
+        <YearDropdown
+          birthYear={1986}
+          maxYear={2086}
+          start
+          fullWidth
           label="Start year"
-          fullWidth
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
           value={state.startYear}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value: e.target.value })
-          }
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'startYear', value })}
         />
-        <Input
-          className="mb-2"
-          label="End year"
+        <YearDropdown
+          birthYear={1986}
+          maxYear={2086}
           fullWidth
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
+          label="End year"
           value={state.endYear}
-          onChange={(e) =>
-            dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value: e.target.value })
-          }
+          onValueChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'endYear', value })}
         />
       </div>
       <Input

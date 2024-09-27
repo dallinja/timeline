@@ -1,3 +1,4 @@
+import { roundToDec } from '@/lib/number'
 import { CreateEntryInput, EventEntries, UpsertEntryInput } from '@/services/entries.client'
 
 export type HouseEntryInput = {

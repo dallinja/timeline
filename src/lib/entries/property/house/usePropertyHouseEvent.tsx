@@ -4,6 +4,7 @@ import { EventEntries } from '@/services/entries.client'
 import { roundToDec } from '@/lib/number'
 
 const DEFAULT_APPRECIATION_RATE = 0.03
+const currentYear = new Date().getFullYear()
 
 type HouseState = {
   // UI
@@ -12,7 +13,6 @@ type HouseState = {
   name: string
   startYear: string
   endYear: string
-  currentHome: boolean
   // Property
   houseValue: string
   appreciationRate: string
@@ -41,23 +41,22 @@ const initialState = (house?: HouseEntryInput): HouseState => ({
   includeMortgage: getIncludeMortgage(house),
   // General
   name: house?.name ?? '',
-  startYear: String(house?.startYear ?? ''),
+  startYear: house?.existing ? 'existing' : String(house?.startYear ?? ''),
   endYear: String(house?.endYear ?? ''),
-  currentHome: house?.existing ?? false,
   // Property
   houseValue: String(house?.houseValue ?? ''),
   appreciationRate: house?.annualAppreciationRate
-    ? String((house.annualAppreciationRate ?? 0) * 100)
+    ? String(roundToDec((house.annualAppreciationRate ?? 0) * 100, 2))
     : String(DEFAULT_APPRECIATION_RATE * 100),
   annualExpenses: String(house?.annualExpenses ?? ''),
-  annualExpensesRate: String(house?.annualExpensesRate ?? ''),
+  annualExpensesRate: String(roundToDec((house?.annualExpensesRate ?? 0) * 100, 2)),
   // Mortgage
   downPayment: String(
     house?.existing ? '' : (house?.houseValue ?? 0) - (house?.mortgageAmount ?? 0) || '',
   ),
   mortgageAmount: String(house?.mortgageAmount ?? ''),
   mortgageYears: String(house?.mortgageYears ?? ''),
-  mortgageRate: String(house?.mortgageRate ?? ''),
+  mortgageRate: String(roundToDec((house?.mortgageRate ?? 0) * 100, 2)),
 })
 
 // Define the reducer function
@@ -78,22 +77,23 @@ export default function usePropertyHouseEvent(
   const [state, dispatch] = useReducer(reducer, undefined, () =>
     initialState(getHouseFromEvent(intialEvent)),
   )
+  const existing = state.startYear === 'existing'
   const houseEntryInput: HouseEntryInput = {
     userId,
     scenario,
     name: state.name,
-    startYear: Number(state.startYear),
+    startYear: existing ? currentYear : Number(state.startYear),
     endYear: Number(state.endYear),
-    existing: state.currentHome,
+    existing: existing,
     houseValue: Number(state.houseValue),
     annualAppreciationRate: roundToDec(Number(state.appreciationRate) / 100, 4),
     annualExpenses: Number(state.annualExpenses),
     annualExpensesRate: roundToDec(Number(state.annualExpensesRate) / 100, 4),
-    mortgageAmount: state.currentHome
+    mortgageAmount: existing
       ? Number(state.mortgageAmount)
       : Number(state.houseValue) - Number(state.downPayment),
     mortgageYears: Number(state.mortgageYears),
-    mortgageRate: Number(state.mortgageRate),
+    mortgageRate: roundToDec(Number(state.mortgageRate) / 100, 4),
   }
   return [state, dispatch, houseEntryInput] as const
 }
