@@ -13,8 +13,6 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { Entry } from '@/services/entries.server'
-import { getBalanceSheetTimeline } from '@/lib/charts/getBalanceSheetTimeline'
-import { getNetWorthTimeline } from '@/lib/charts/getNetWorthTimeline'
 import getYearsData from '@/lib/charts/getYearsData'
 
 export const description = 'An interactive bar chart'

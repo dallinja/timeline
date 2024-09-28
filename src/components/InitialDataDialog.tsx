@@ -15,8 +15,8 @@ import { Text } from './ui/text'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { Switch } from './ui/switch'
 import { createTimeline } from '@/actions/createTimeline'
-import { getEntries } from '@/services/local'
-import { useCreateEntries, useDeleteEntries } from '@/queries/localEntries'
+import { useCreateEntries, useDeleteEntries } from '@/queries/entries'
+import { getEntries } from '@/services/entries.client'
 
 export interface InitialDataDialogProps {
   scenario: string
@@ -32,7 +32,7 @@ const InitialDataDialog = ({ scenario }: InitialDataDialogProps) => {
   const { mutate: deleteEntries } = useDeleteEntries({ skipInvalidation: true })
 
   useEffect(() => {
-    const entries = getEntries()
+    const entries = getEntries({ userId: '1', scenario: 'default' })
     if (!entries) {
       setOpen(true)
     }
@@ -41,14 +41,17 @@ const InitialDataDialog = ({ scenario }: InitialDataDialogProps) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const data = new FormData(e.target as HTMLFormElement)
-    deleteEntries([{ id: undefined, scenario: 'default' }], {
-      onSuccess: () => {
-        console.log('hey buddy')
-        const entries = createTimeline(data)
-        createEntries(entries)
-        setOpen(false)
+    deleteEntries(
+      { ids: [] },
+      {
+        onSuccess: () => {
+          console.log('hey buddy')
+          // const entries = createTimeline(data)
+          // createEntries(entries)
+          setOpen(false)
+        },
       },
-    })
+    )
   }
 
   return (

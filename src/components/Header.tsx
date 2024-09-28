@@ -12,7 +12,7 @@ export default function Header() {
           <ScenarioSelection />
         </div>
         <div className="flex items-center gap-5 font-semibold">
-          <InitialDataDialog />
+          <InitialDataDialog scenario="" />
           <ProfileDropdown />
         </div>
         {/* {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />} */}

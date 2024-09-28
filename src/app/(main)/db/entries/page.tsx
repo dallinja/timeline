@@ -7,7 +7,6 @@ import { SelectField, SelectItem } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/cn'
 import { EntryField, EntryFields } from '@/lib/types'
-import { useDeleteEntries, useEntries, useUpdateEntry } from '@/queries/localEntries'
 import { CheckedState } from '@radix-ui/react-checkbox'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -15,10 +14,10 @@ const scenarios = ['default', 'optimistic', 'pessimistic'] as const
 
 export default function DBEntriesPage() {
   const [scenario, setScenario] = useState('default')
-  const { data: entries } = useEntries({ scenario })
+  const { data: entries } = { data: [] as any[] }
   const [selectedRows, setSelectedRows] = useState<Record<number, CheckedState>>({})
 
-  const { mutate: deleteRows } = useDeleteEntries()
+  const { mutate: deleteRows } = { mutate: (a: any) => {} }
 
   const handleSelectRow = (id: number, checked: CheckedState) => {
     setSelectedRows((prev) => ({ ...prev, [id]: checked }))
@@ -108,7 +107,7 @@ function Cell({ entryId, field, value, startOpen }: CellProps) {
   const [isEditing, setIsEditing] = useState(startOpen ?? false)
   const [inputValue, setInputValue] = useState(value)
 
-  const { mutate: updateEntry } = useUpdateEntry()
+  const { mutate: updateEntry } = { mutate: (a: any, b: any) => {} }
 
   const handleSave = () => {
     let newValue = value
