@@ -1,21 +1,25 @@
-import { Entry, EntryType } from '@/services/entries.server'
+import { Entry } from '@/services/entries.server'
 import { emptyYearData, YearData } from './types'
-import getYearDataCash from './getYearDataIncome'
 import getYearDataProperty from './getYearDataProperty'
 import getYearDataInvestments from './getYearDataInvestments'
 import getYearDataLoans from './getYearDataLoans'
 import { roundDataToDecimals } from '../number'
 import getYearDataIncome from './getYearDataIncome'
 import getYearDataExpenses from './getYearDataExpenses'
+import { FilingStatus, getTaxesForYear } from './getTaxes'
 
 const currentYear = new Date().getFullYear()
 
-export default function getYearsData(entries: Entry[], maxYearProp: number): YearData[] {
+export default function getYearsData(
+  entries: Entry[],
+  maxYearProp: number,
+  filingStatus: FilingStatus = FilingStatus.MarriedFilingJointly,
+): YearData[] {
   const { minYear, maxYear } = getMinMaxYear(entries, maxYearProp)
 
   const yearsDataPerYear = getYearsDataPerYear(entries, maxYear)
 
-  return cumulativeYearBSData(yearsDataPerYear, minYear, maxYear)
+  return cumulativeYearBSData(yearsDataPerYear, minYear, maxYear, filingStatus)
 }
 
 function getMinMaxYear(entries: Entry[], maxYearProp: number) {
@@ -65,6 +69,83 @@ function getYearsDataPerYear(entries: Entry[], maxYear: number): Record<number, 
   return yearsDataPerYear
 }
 
+function cumulativeYearBSData(
+  yearDataPerYear: Record<number, YearData>,
+  minYear: number,
+  maxYear: number,
+  filingStatus: FilingStatus,
+): YearData[] {
+  const years = [...Array(maxYear - minYear + 1)]
+  return years.reduce<YearData[]>((acc, _, index) => {
+    const year = minYear + index
+    const previous: YearData = index < 1 ? emptyYearData() : (acc[index - 1] ?? emptyYearData())
+    const income = roundDataToDecimals(yearDataPerYear[year]?.operating.income ?? 0)
+    const taxes = getTaxesForYear(income, year, filingStatus)
+    const current = {
+      year,
+      operating: {
+        income,
+        expenses: roundDataToDecimals((yearDataPerYear[year]?.operating.expenses ?? 0) + -taxes),
+        total: 0,
+      },
+      investing: {
+        property: roundDataToDecimals(yearDataPerYear[year]?.investing.property ?? 0),
+        investments: roundDataToDecimals(yearDataPerYear[year]?.investing.investments ?? 0),
+        total: 0,
+      },
+      financing: {
+        loans: roundDataToDecimals(yearDataPerYear[year]?.financing.loans ?? 0),
+        total: 0,
+      },
+      assets: {
+        cash: roundDataToDecimals(
+          previous.assets.cash + (yearDataPerYear[year]?.assets.cash ?? 0) - taxes,
+        ),
+        property: roundDataToDecimals(
+          previous.assets.property + (yearDataPerYear[year]?.assets.property ?? 0),
+        ),
+        investments: roundDataToDecimals(
+          previous.assets.investments + (yearDataPerYear[year]?.assets.investments ?? 0),
+        ),
+        total: 0,
+      },
+      liabilities: {
+        loans: roundDataToDecimals(
+          previous.liabilities.loans + (yearDataPerYear[year]?.liabilities.loans ?? 0),
+        ),
+        total: 0,
+      },
+      netWorth: roundDataToDecimals(
+        previous.netWorth + (yearDataPerYear[year]?.netWorth ?? 0) - taxes,
+      ),
+    }
+    acc.push({
+      ...current,
+      operating: {
+        ...current.operating,
+        total: current.operating.income + current.operating.expenses,
+      },
+      investing: {
+        ...current.investing,
+        total: current.investing.property + current.investing.investments,
+      },
+      financing: {
+        ...current.financing,
+        total: current.financing.loans,
+      },
+      assets: {
+        ...current.assets,
+        total: current.assets.cash + current.assets.property + current.assets.investments,
+      },
+      liabilities: {
+        ...current.liabilities,
+        total: current.liabilities.loans,
+      },
+    })
+    return acc
+  }, [])
+}
+
 function combineData(data: YearData, previousData?: YearData): YearData {
   if (!previousData) return data
 
@@ -96,74 +177,4 @@ function combineData(data: YearData, previousData?: YearData): YearData {
     },
     netWorth: data.netWorth + previousData.netWorth,
   }
-}
-
-function cumulativeYearBSData(
-  yearDataPerYear: Record<number, YearData>,
-  minYear: number,
-  maxYear: number,
-): YearData[] {
-  const years = [...Array(maxYear - minYear + 1)]
-  return years.reduce<YearData[]>((acc, _, index) => {
-    const year = minYear + index
-    const previous: YearData = index < 1 ? emptyYearData() : (acc[index - 1] ?? emptyYearData())
-    const current = {
-      year,
-      operating: {
-        income: roundDataToDecimals(yearDataPerYear[year]?.operating.income ?? 0),
-        expenses: roundDataToDecimals(yearDataPerYear[year]?.operating.expenses ?? 0),
-        total: 0,
-      },
-      investing: {
-        property: roundDataToDecimals(yearDataPerYear[year]?.investing.property ?? 0),
-        investments: roundDataToDecimals(yearDataPerYear[year]?.investing.investments ?? 0),
-        total: 0,
-      },
-      financing: {
-        loans: roundDataToDecimals(yearDataPerYear[year]?.financing.loans ?? 0),
-        total: 0,
-      },
-      assets: {
-        cash: roundDataToDecimals(previous.assets.cash + (yearDataPerYear[year]?.assets.cash ?? 0)),
-        property: roundDataToDecimals(
-          previous.assets.property + (yearDataPerYear[year]?.assets.property ?? 0),
-        ),
-        investments: roundDataToDecimals(
-          previous.assets.investments + (yearDataPerYear[year]?.assets.investments ?? 0),
-        ),
-        total: 0,
-      },
-      liabilities: {
-        loans: roundDataToDecimals(
-          previous.liabilities.loans + (yearDataPerYear[year]?.liabilities.loans ?? 0),
-        ),
-        total: 0,
-      },
-      netWorth: roundDataToDecimals(previous.netWorth + (yearDataPerYear[year]?.netWorth ?? 0)),
-    }
-    acc.push({
-      ...current,
-      operating: {
-        ...current.operating,
-        total: current.operating.income + current.operating.expenses,
-      },
-      investing: {
-        ...current.investing,
-        total: current.investing.property + current.investing.investments,
-      },
-      financing: {
-        ...current.financing,
-        total: current.financing.loans,
-      },
-      assets: {
-        ...current.assets,
-        total: current.assets.cash + current.assets.property + current.assets.investments,
-      },
-      liabilities: {
-        ...current.liabilities,
-        total: current.liabilities.loans,
-      },
-    })
-    return acc
-  }, [])
 }

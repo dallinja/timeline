@@ -10,6 +10,7 @@ export type JobEventInput = {
   annualRaiseRate?: number
   taxable?: boolean
   startingBonus?: number
+  annualInvestmentRate?: number
   annualDonationRate?: number
 }
 
@@ -43,6 +44,7 @@ function buildJobEntries(
     annualRaiseRate,
     taxable = false,
     startingBonus,
+    annualInvestmentRate,
     annualDonationRate,
   }: JobEventInput,
   selectedEvent?: EventEntries,
@@ -66,10 +68,31 @@ function buildJobEntries(
     ...(taxable ? { cash_taxable: true } : {}),
   }
 
+  const relatedInvestment = selectedEvent?.relatedEntries?.find(
+    (ent) => ent.sub_type === 'annual_investment',
+  )
   const relatedDonation = selectedEvent?.relatedEntries?.find(
     (ent) => ent.sub_type === 'annual_donation',
   )
   const relatedEntries: (CreateEntryInput | UpsertEntryInput)[] = []
+
+  if (annualInvestmentRate) {
+    const investmentEntry: CreateEntryInput | UpsertEntryInput = {
+      ...(relatedInvestment ? { id: relatedInvestment.id } : {}),
+      user_id: userId,
+      scenario,
+      name: 'Annual investment',
+      type: 'investment' as CreateEntryInput['type'],
+      sub_type: 'annual_investment' as CreateEntryInput['sub_type'],
+      start_year: startYear,
+      end_year: endYear,
+      investments_recurring: -annualSalary * annualInvestmentRate,
+      investments_rate: 0.1,
+      ...(annualRaiseRate ? { investment_recurring_rate: annualRaiseRate } : {}),
+      ...(selectedEvent ? { parent_id: selectedEvent.id } : {}),
+    }
+    relatedEntries.push(investmentEntry)
+  }
 
   if (annualDonationRate) {
     const donationEntry: CreateEntryInput | UpsertEntryInput = {
@@ -96,6 +119,9 @@ function buildJobEntries(
 
 export function getJobFromEvent(event?: EventEntries): JobEventInput | undefined {
   if (!event) return undefined
+  const relatedInvestment = event.relatedEntries?.find(
+    (ent) => ent.sub_type === 'annual_investment',
+  )
   const relatedDonation = event.relatedEntries?.find((ent) => ent.sub_type === 'annual_donation')
   return {
     userId: event.user_id,
@@ -107,6 +133,9 @@ export function getJobFromEvent(event?: EventEntries): JobEventInput | undefined
     taxable: event.cash_taxable ?? false,
     annualRaiseRate: event.cash_recurring_rate ?? 0,
     startingBonus: event.cash_start ?? 0,
+    annualInvestmentRate: relatedInvestment
+      ? (relatedInvestment.cash_recurring ?? 0) / -(event.cash_recurring ?? 1)
+      : undefined,
     annualDonationRate: relatedDonation
       ? (relatedDonation.cash_recurring ?? 0) / -(event.cash_recurring ?? 1)
       : undefined,

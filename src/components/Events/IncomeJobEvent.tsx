@@ -134,9 +134,19 @@ export default function IncomeJobEvent({
         }
       />
       <Text className="mt-6" bold>
-        Related expenses
+        Related options
       </Text>
       <Divider className="mb-2" />
+      <div className="mb-4 flex gap-5">
+        <Input
+          label="Annual investing percentage (%)"
+          value={state.annualInvestmentRate}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'annualInvestmentRate', value: e.target.value })
+          }
+        />
+        <Input label="Type" />
+      </div>
       <Input
         className="mb-2"
         label="Annual donation percentage (%)"

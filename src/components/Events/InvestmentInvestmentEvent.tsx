@@ -74,6 +74,8 @@ export default function InvestmentInvestmentEvent({
     })
   }
 
+  const existing = state.startYear === 'existing'
+
   return (
     <>
       <Input
@@ -108,10 +110,28 @@ export default function InvestmentInvestmentEvent({
       <div className="mb-2 flex gap-5">
         <Input
           fullWidth
-          label="Starting annual amount"
+          label={existing ? 'Current annual amount' : 'Starting annual amount'}
           value={state.annualAmount}
           onChange={(e) =>
             dispatch({ type: 'UPDATE_FIELD', field: 'annualAmount', value: e.target.value })
+          }
+        />
+        <Input
+          fullWidth
+          label="Annual growth rate (%)"
+          value={state.annualGrowthRate}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'annualGrowthRate', value: e.target.value })
+          }
+        />
+      </div>
+      <div className="mb-2 flex gap-5">
+        <Input
+          fullWidth
+          label="Starting amount"
+          value={state.startAmount}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'startAmount', value: e.target.value })
           }
         />
         <Input

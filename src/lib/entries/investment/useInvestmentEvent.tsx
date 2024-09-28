@@ -12,7 +12,9 @@ type InvestmentState = {
   startYear: string
   endYear: string
   // Investment
+  startAmount: string
   annualAmount: string
+  annualGrowthRate: string
   annualReturnRate: string
   taxable: boolean
 }
@@ -27,12 +29,16 @@ type InvestmentAction = {
 const initialState = (investment?: InvestmentEventInput): InvestmentState => ({
   // General
   name: investment?.name ?? '',
-  startYear: String(investment?.startYear ?? ''),
+  startYear: investment?.existing ? 'existing' : String(investment?.startYear ?? ''),
   endYear: String(investment?.endYear ?? ''),
   // Investment
+  startAmount: String(investment?.startAmount ?? ''),
   annualAmount: String(investment?.annualAmount ?? ''),
+  annualGrowthRate: investment?.annualGrowthRate
+    ? String(roundToDec((investment.annualGrowthRate ?? 0) * 100, 2))
+    : String(DEFAULT_RETURN_RATE * 100),
   annualReturnRate: investment?.annualReturnRate
-    ? String((investment.annualReturnRate ?? 0) * 100)
+    ? String(roundToDec((investment.annualReturnRate ?? 0) * 100, 2))
     : String(DEFAULT_RETURN_RATE * 100),
   taxable: investment?.taxable ?? false,
 })
@@ -55,14 +61,17 @@ export default function useIncomeInvestmentEvent(
   const [state, dispatch] = useReducer(reducer, undefined, () =>
     initialState(getInvestmentFromEvent(intialEvent)),
   )
+  const existing = state.startYear === 'existing'
   const houseEntryInput: InvestmentEventInput = {
     userId,
     scenario,
     name: state.name,
-    startYear: state.startYear === 'existing' ? currentYear : Number(state.startYear),
+    startYear: existing ? currentYear : Number(state.startYear),
     endYear: Number(state.endYear),
-    existing: state.startYear === 'existing',
+    existing: existing,
+    startAmount: Number(state.startAmount),
     annualAmount: Number(state.annualAmount),
+    annualGrowthRate: roundToDec(Number(state.annualGrowthRate) / 100, 4),
     annualReturnRate: roundToDec(Number(state.annualReturnRate) / 100, 4),
     taxable: state.taxable,
   }
