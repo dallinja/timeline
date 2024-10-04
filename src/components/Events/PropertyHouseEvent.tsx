@@ -83,7 +83,7 @@ export default function PropertyHouseEvent({
       <div className="mb-2 flex gap-5">
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           start
           fullWidth
           label="Purchase year"
@@ -92,7 +92,7 @@ export default function PropertyHouseEvent({
         />
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           fullWidth
           label="Planned sale year"
           value={state.endYear}

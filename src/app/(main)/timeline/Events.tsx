@@ -26,7 +26,7 @@ export default function Events({ entries, userId, scenario }: EventsProps) {
           eventType="income"
           title="Income"
           events={events.income}
-          maxYear={2086}
+          maxYear={2076}
         />
       </div>
       <div className="col-span-3">
@@ -36,7 +36,7 @@ export default function Events({ entries, userId, scenario }: EventsProps) {
           eventType="expense"
           title="Expenses"
           events={events.expense}
-          maxYear={2086}
+          maxYear={2076}
         />
       </div>
       <div className="col-span-3">
@@ -46,7 +46,7 @@ export default function Events({ entries, userId, scenario }: EventsProps) {
           eventType="property"
           title="Property"
           events={events.property}
-          maxYear={2086}
+          maxYear={2076}
         />
       </div>
       <div className="col-span-3">
@@ -56,7 +56,7 @@ export default function Events({ entries, userId, scenario }: EventsProps) {
           eventType="investment"
           title="Investments"
           events={events.investment}
-          maxYear={2086}
+          maxYear={2076}
         />
       </div>
     </div>

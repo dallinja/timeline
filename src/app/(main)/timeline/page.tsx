@@ -4,6 +4,7 @@ import { getEntries, getEntriesAndSubEntries } from '@/services/entries.server'
 import Events from './Events'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Breakdown from '@/components/Breakdown/Breakdown'
+import CashFlowChart from '@/components/CashFlowChart'
 // import InitialDataDialog from '@/components/InitialDataDialog'
 
 export default async function Timeline({
@@ -23,14 +24,39 @@ export default async function Timeline({
 
   return (
     <>
-      <div className="w-full p-8">
-        <NetWorthChart entries={entries} maxYear={2086} />
+      <div className="w-full px-8 pb-8">
+        <ChartTabGroup
+          CashFlow={<CashFlowChart entries={entries} maxYear={2076} />}
+          NetWorth={<NetWorthChart entries={entries} maxYear={2076} />}
+        />
+        {/* <NetWorthChart entries={entries} maxYear={2076} /> */}
         <TabGroup
           Events={<Events entries={entriesAndSubEntries} userId={userId} scenario={scenario} />}
           Breakdown={<Breakdown entries={entries} />}
         />
       </div>
     </>
+  )
+}
+
+function ChartTabGroup({
+  CashFlow,
+  NetWorth,
+}: {
+  CashFlow: React.ReactNode
+  NetWorth: React.ReactNode
+}) {
+  return (
+    <Tabs defaultValue="cashFlow" className="my-4 w-full">
+      <div className="mb-3 flex w-full justify-center">
+        <TabsList>
+          <TabsTrigger value="cashFlow">CashFlow</TabsTrigger>
+          <TabsTrigger value="netWorth">NetWorth</TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent value="cashFlow">{CashFlow}</TabsContent>
+      <TabsContent value="netWorth">{NetWorth}</TabsContent>
+    </Tabs>
   )
 }
 

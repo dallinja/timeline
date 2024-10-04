@@ -14,7 +14,7 @@ type Data = {
 }[]
 
 export default function Breakdown({ entries }: { entries: Entry[] }) {
-  const yearsData = getYearsData(entries, 2086)
+  const yearsData = getYearsData(entries, 2076)
   return (
     <div>
       <Table>

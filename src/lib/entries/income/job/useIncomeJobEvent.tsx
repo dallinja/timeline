@@ -15,8 +15,11 @@ type JobState = {
   annualRaiseRate: string
   taxable: boolean
   startingBonus: string
-  // Related
+  // Related investment
+  hasAnnualInvestment: boolean
   annualInvestmentRate: string
+  // Related donation
+  hasAnnualDonation: boolean
   annualDonationRate: string
 }
 
@@ -40,9 +43,11 @@ const initialState = (job?: JobEventInput): JobState => ({
   taxable: job?.taxable ?? false,
   startingBonus: String(job?.startingBonus ?? ''),
   // Other
+  hasAnnualInvestment: !!job?.annualInvestmentRate,
   annualInvestmentRate: job?.annualInvestmentRate
     ? String((job.annualInvestmentRate ?? 0) * 100)
     : '',
+  hasAnnualDonation: !!job?.annualDonationRate,
   annualDonationRate: job?.annualDonationRate ? String((job.annualDonationRate ?? 0) * 100) : '',
 })
 
@@ -74,8 +79,12 @@ export default function useIncomeJobEvent(
     annualRaiseRate: roundToDec(Number(state.annualRaiseRate) / 100, 4),
     startingBonus: Number(state.startingBonus),
     taxable: state.taxable,
-    annualInvestmentRate: roundToDec(Number(state.annualInvestmentRate) / 100, 4),
-    annualDonationRate: roundToDec(Number(state.annualDonationRate) / 100, 4),
+    annualInvestmentRate: state.hasAnnualInvestment
+      ? roundToDec(Number(state.annualInvestmentRate) / 100, 4)
+      : 0,
+    annualDonationRate: state.hasAnnualDonation
+      ? roundToDec(Number(state.annualDonationRate) / 100, 4)
+      : 0,
   }
   return [state, dispatch, houseEntryInput] as const
 }

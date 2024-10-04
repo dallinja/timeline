@@ -91,7 +91,7 @@ export default function InvestmentInvestmentEvent({
       <div className="mb-4 flex gap-5">
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           start
           fullWidth
           label="Start year"
@@ -100,7 +100,7 @@ export default function InvestmentInvestmentEvent({
         />
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           fullWidth
           label="End year"
           value={state.endYear}

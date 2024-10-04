@@ -66,14 +66,14 @@ export default function getYearDataInvestments(
   }
 
   // Last year
-  if (index === lastIndex) {
-    // convert all investments to cash (start + recurring)
-    const endAmount = endOfYearValue + endOfYearGrowingAnnuity
-    yearData.investing.investments += endAmount
+  // if (index === lastIndex) {
+  //   // convert all investments to cash (start + recurring)
+  //   const endAmount = endOfYearValue + endOfYearGrowingAnnuity
+  //   yearData.investing.investments += endAmount
 
-    yearData.assets.cash += endAmount
-    yearData.assets.investments -= endAmount
-  }
+  //   yearData.assets.cash += endAmount
+  //   yearData.assets.investments -= endAmount
+  // }
 
   const roundedYearData = roundDataToDecimals(yearData, 4)
 

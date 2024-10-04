@@ -14,6 +14,7 @@ import {
 } from '@/lib/entries/useEntries'
 import { EventEntries } from '@/services/entries.client'
 import { YearDropdown } from '../YearDropdown'
+import { Plus, Trash2 } from 'lucide-react'
 
 export interface IncomeJobEventProps {
   userId: string
@@ -82,7 +83,7 @@ export default function IncomeJobEvent({
       <div className="mb-4 flex gap-5">
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           start
           fullWidth
           label="Start year"
@@ -91,7 +92,7 @@ export default function IncomeJobEvent({
         />
         <YearDropdown
           birthYear={1986}
-          maxYear={2086}
+          maxYear={2076}
           fullWidth
           label="End year"
           value={state.endYear}
@@ -106,38 +107,139 @@ export default function IncomeJobEvent({
           dispatch({ type: 'UPDATE_FIELD', field: 'annualSalary', value: e.target.value })
         }
       />
-      <Text fontSize="sm" className="flex items-center justify-between font-semibold">
-        Is this taxable?
+      {/* <Text className="mt-6" bold>
+        Other details
+      </Text>
+      <Divider className="mb-2" /> */}
+      <div className="mb-4 flex gap-5">
+        <Input
+          label="Annual raise rate (%)"
+          value={state.annualRaiseRate}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'annualRaiseRate', value: e.target.value })
+          }
+        />
+        <Input
+          label="Signing bonus"
+          value={state.startingBonus}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_FIELD', field: 'startingBonus', value: e.target.value })
+          }
+        />
+      </div>
+      {state.hasAnnualInvestment && (
+        <>
+          <div className="mt-6 flex items-end justify-between">
+            <Text bold>Annual Retirement Investment</Text>
+            <Button
+              className="h-6"
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                dispatch({ type: 'UPDATE_FIELD', field: 'hasAnnualInvestment', value: false })
+              }
+            >
+              <Trash2 className="mr-1" size={16} />
+              Remove
+            </Button>
+          </div>
+          <Divider className="mb-2" />
+          <Text className="text-gray-500" fontSize="xs">
+            What percentage of your gross income would you like to invest into your retirement each
+            year?
+          </Text>
+          <Input
+            className="mb-2"
+            label="Annual percentage (%)"
+            value={state.annualInvestmentRate}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                field: 'annualInvestmentRate',
+                value: e.target.value,
+              })
+            }
+          />
+        </>
+      )}
+      {state.hasAnnualDonation && (
+        <>
+          <div className="mt-6 flex items-end justify-between">
+            <Text bold>Annual Charity Donation</Text>
+            <Button
+              className="h-6"
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                dispatch({ type: 'UPDATE_FIELD', field: 'hasAnnualDonation', value: false })
+              }
+            >
+              <Trash2 className="mr-1" size={16} />
+              Remove
+            </Button>
+          </div>
+          <Divider className="mb-2" />
+          <Text className="text-gray-500" fontSize="xs">
+            What percentage of your gross income would you like to donate to charity each year?
+          </Text>
+          <Input
+            className="mb-2"
+            label="Annual percentage (%)"
+            value={state.annualDonationRate}
+            onChange={(e) =>
+              dispatch({ type: 'UPDATE_FIELD', field: 'annualDonationRate', value: e.target.value })
+            }
+          />
+        </>
+      )}
+      {(!state.hasAnnualDonation || !state.hasAnnualInvestment) && (
+        <>
+          <Text className="mt-6" bold>
+            Related options
+          </Text>
+          <Divider className="mb-2" />
+        </>
+      )}
+      {/* <Text fontSize="sm" className="my-4 flex items-center justify-between font-semibold">
+        Add annual investment
         <Switch
-          checked={state.taxable}
+          checked={false}
           onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
         />
       </Text>
-      <Text className="mt-6" bold>
-        Other details
-      </Text>
-      <Divider className="mb-2" />
-      <Input
-        className="mb-2"
-        label="Annual raise rate (%)"
-        value={state.annualRaiseRate}
-        onChange={(e) =>
-          dispatch({ type: 'UPDATE_FIELD', field: 'annualRaiseRate', value: e.target.value })
-        }
-      />
-      <Input
-        className="mb-2"
-        label="Signing bonus"
-        value={state.startingBonus}
-        onChange={(e) =>
-          dispatch({ type: 'UPDATE_FIELD', field: 'startingBonus', value: e.target.value })
-        }
-      />
-      <Text className="mt-6" bold>
-        Related options
-      </Text>
-      <Divider className="mb-2" />
-      <div className="mb-4 flex gap-5">
+      <Text fontSize="sm" className="my-4 flex items-center justify-between font-semibold">
+        Add annual donation
+        <Switch
+          checked={false}
+          onCheckedChange={(value) => dispatch({ type: 'UPDATE_FIELD', field: 'taxable', value })}
+        />
+      </Text> */}
+
+      {!state.hasAnnualInvestment && (
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            onClick={() =>
+              dispatch({ type: 'UPDATE_FIELD', field: 'hasAnnualInvestment', value: true })
+            }
+          >
+            <Plus className="-ml-2 mr-1" size={20} /> Add yearly investment
+          </Button>
+        </div>
+      )}
+      {!state.hasAnnualDonation && (
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            onClick={() =>
+              dispatch({ type: 'UPDATE_FIELD', field: 'hasAnnualDonation', value: true })
+            }
+          >
+            <Plus className="-ml-2 mr-1" size={20} /> Add yearly donation
+          </Button>
+        </div>
+      )}
+      {/* <div className="mb-4 flex gap-5">
         <Input
           label="Annual investing percentage (%)"
           value={state.annualInvestmentRate}
@@ -154,7 +256,7 @@ export default function IncomeJobEvent({
         onChange={(e) =>
           dispatch({ type: 'UPDATE_FIELD', field: 'annualDonationRate', value: e.target.value })
         }
-      />
+      /> */}
       <div className="flex justify-end gap-4 py-4">
         {selectedEvent && (
           <Button variant="error" onClick={handleDelete}>

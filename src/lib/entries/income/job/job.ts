@@ -86,9 +86,9 @@ function buildJobEntries(
       sub_type: 'annual_investment' as CreateEntryInput['sub_type'],
       start_year: startYear,
       end_year: endYear,
-      investments_recurring: -annualSalary * annualInvestmentRate,
+      investments_recurring: annualSalary * annualInvestmentRate,
       investments_rate: 0.1,
-      ...(annualRaiseRate ? { investment_recurring_rate: annualRaiseRate } : {}),
+      ...(annualRaiseRate ? { investments_recurring_rate: annualRaiseRate } : {}),
       ...(selectedEvent ? { parent_id: selectedEvent.id } : {}),
     }
     relatedEntries.push(investmentEntry)
@@ -134,7 +134,7 @@ export function getJobFromEvent(event?: EventEntries): JobEventInput | undefined
     annualRaiseRate: event.cash_recurring_rate ?? 0,
     startingBonus: event.cash_start ?? 0,
     annualInvestmentRate: relatedInvestment
-      ? (relatedInvestment.cash_recurring ?? 0) / -(event.cash_recurring ?? 1)
+      ? (relatedInvestment.investments_recurring ?? 0) / (event.cash_recurring ?? 1)
       : undefined,
     annualDonationRate: relatedDonation
       ? (relatedDonation.cash_recurring ?? 0) / -(event.cash_recurring ?? 1)
